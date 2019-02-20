@@ -121,7 +121,7 @@ var animate = function () {
     scene.add(zenithLabel.mesh);
     scene.add(nadirLabel.mesh)
 
-    if (!start_loaded && star.mesh)
+    if (!star_loaded && star.mesh)
     {
         scene.add(star.mesh)
     }
