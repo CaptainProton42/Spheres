@@ -75,11 +75,11 @@ S = new DirectionMarker(new THREE.Vector3(0.0, 0.0, 1.1), new THREE.Vector3(0.0,
 
 arc = new Arc3D(1, 0.0, 1.0, new THREE.Vector3(0.0, 0.0, 0.0), new THREE.Vector3(0.0, -Math.PI, Math.PI/2));
 arc.setStyle(lineStyleArrow)
-arc_surface = new ArcSurface3D(1, 0.0, 1.0, new THREE.Vector3(0.0, 0.0, 0.0), new THREE.Vector3(0.0, 0.0, 0.0), 0xA569BD);
+arc_surface = new ArcSurface3D(1, 0.0, 1.0, new THREE.Vector3(0.0, 0.0, 0.0), new THREE.Vector3(0.0, 0.0, 0.0), 0xff6361);
 
 starphi =0.0;
 starpos = new THREE.Spherical(1.0, 1.0, 0.0);
-star = new Star(new THREE.Vector3(0.0, 0.0,0.0), 0xA569BD);
+star = new Star(new THREE.Vector3(0.0, 0.0,0.0), 0xff6361);
 
 scene.add(arc.mesh)
 scene.add(star.mesh)
@@ -142,7 +142,7 @@ var animate = function () {
 
     var arc_new = new Arc3D(1, 0.0, Math.PI/2 - starpos_kk.phi, new THREE.Vector3(0.0, 0.0, 0.0), new THREE.Vector3(-Math.cos(starpos_kk.theta), 0.0, Math.sin(starpos_kk.theta)));
     arc_new.setStyle(lineStyleArrow)
-    arc_surface_new = new ArcSurface3D(1, 0.0, Math.PI/2 - starpos_kk.phi, new THREE.Vector3(0.0, 0.0, 0.0), new THREE.Vector3(-Math.cos(starpos_kk.theta), 0.0, Math.sin(starpos_kk.theta)), 0xA569BD);
+    arc_surface_new = new ArcSurface3D(1, 0.0, Math.PI/2 - starpos_kk.phi, new THREE.Vector3(0.0, 0.0, 0.0), new THREE.Vector3(-Math.cos(starpos_kk.theta), 0.0, Math.sin(starpos_kk.theta)), 0xff6361);
 
     scene.remove(arc.mesh);
     scene.remove(arc_surface.mesh);
