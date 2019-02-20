@@ -10,6 +10,27 @@ class Shape3D {
     }
 }
 
+class Star extends Shape3D {
+    constructor(position, color) {
+        super();
+        var loader = new THREE.GLTFLoader();
+        var parent = this;
+
+        loader.load( 'models/star.glb', function ( gltf ) {
+
+            var geometry =  gltf.scene.children[0].geometry;
+            var material = new THREE.MeshBasicMaterial( { color: color } );
+            var mesh = new THREE.Mesh( geometry, material );
+            parent.mesh = mesh;
+
+        }, undefined, function ( error ) {
+
+            console.error( error );
+
+        } );
+    }
+}
+
 class Dot3D extends Shape3D {
     constructor(position, size, color) {
         super();

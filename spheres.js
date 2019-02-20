@@ -79,7 +79,7 @@ arc_surface = new ArcSurface3D(1, 0.0, 1.0, new THREE.Vector3(0.0, 0.0, 0.0), ne
 
 starphi =0.0;
 starpos = new THREE.Spherical(1.0, 1.0, 0.0);
-star = new Dot3D(new THREE.Vector3(0.0, 0.0,0.0), 0.03, 0xA569BD);
+star = new Star(new THREE.Vector3(0.0, 0.0,0.0), 0xA569BD);
 
 scene.add(arc.mesh)
 scene.add(star.mesh)
@@ -107,6 +107,8 @@ loader.load( 'models/observer.glb', function ( gltf ) {
 
 } );
 
+var star_loaded = false;
+
 var animate = function () {
     requestAnimationFrame( animate );
 
@@ -118,6 +120,11 @@ var animate = function () {
     scene.add(WLabel.mesh)
     scene.add(zenithLabel.mesh);
     scene.add(nadirLabel.mesh)
+
+    if (!start_loaded && star.mesh)
+    {
+        scene.add(star.mesh)
+    }
 
     
     starpos.theta -= 0.01;
