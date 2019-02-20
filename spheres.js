@@ -98,7 +98,7 @@ loader.load( 'models/observer.glb', function ( gltf ) {
     var geometry =  gltf.scene.children[0].geometry;
     var material = new THREE.MeshBasicMaterial( {color: 0x666666 } );
     var mesh = new THREE.Mesh( geometry, mesh );
-    mesh.rotation.x = Math.PI/2;
+    mesh.rotation.x = -Math.PI/2;
     scene.add(mesh);
 
 }, undefined, function ( error ) {
