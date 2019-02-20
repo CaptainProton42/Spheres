@@ -95,10 +95,9 @@ var loader = new THREE.GLTFLoader();
 
 loader.load( 'models/observer.glb', function ( gltf ) {
 
-    var geometry =  gltf.scene.children[0].geometry;
-    console.log(geometry);
+    var mesh =  gltf.scene.children[0];
     var material = new THREE.MeshBasicMaterial( {color: 0x666666 } );
-    var mesh = new THREE.Mesh(geometry, material);
+    console.log(mesh)
     scene.add(mesh);
 
 }, undefined, function ( error ) {
