@@ -95,7 +95,8 @@ var loader = new THREE.GLTFLoader();
 
 loader.load( 'models/observer.glb', function ( gltf ) {
 
-	scene.add( gltf.scene );
+    var mesh =  gltf.scene.children[0]
+    scene.add(mesh)
 
 }, undefined, function ( error ) {
 
