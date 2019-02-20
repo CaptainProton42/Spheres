@@ -93,7 +93,7 @@ scene.add(nadir.mesh)
 
 var loader = new THREE.GLTFLoader();
 
-loader.load( 'models/observer.gltf', function ( gltf ) {
+loader.load( 'models/observer.glb', function ( gltf ) {
 
 	scene.add( gltf.scene );
 
