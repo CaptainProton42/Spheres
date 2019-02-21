@@ -26,7 +26,8 @@ lineStyle1 = new LineStyle3D(0.005, 0x003f5c);
 lineStyle2 = new LineStyle3D(0.005, 0xffa600);
 lineStyle3 = new LineStyle3D(0.005, 0xbc5090);
 lineStyleLight = new LineStyle3D(0.005, 0x666666);
-lineStyleArrow = new LineStyle3D(0.005, 0xff6361, true);
+lineStyleOrbit = new LineStyle3D(0.005, 0xff9b99);
+lineStyleArrow = new LineStyle3D(0.007, 0xff6361, true);
 
 // 3D curves and lines.
 horizon = new Circle3D(1, new THREE.Vector3(0.0, 0.0, 0.0), new THREE.Vector3(0.0, 1.0, 0.0));
@@ -77,12 +78,21 @@ scene.add(meridianDisc.getMesh());
 S = new DirectionMarker(new THREE.Vector3(0.0, 0.0, 1.1), new THREE.Vector3(0.0, 0.0, 1.0), 0.1, 0x666666);
 
 arc = new Arc3D(1, 0.0, 1.0, new THREE.Vector3(0.0, 0.0, 0.0), new THREE.Vector3(0.0, -Math.PI, Math.PI/2));
+arc2 = new Arc3D(1, 0.0, 1.0, new THREE.Vector3(0.0, 0.0, 0.0), new THREE.Vector3(0.0, -Math.PI, Math.PI/2));
 arc.setStyle(lineStyleArrow)
+arc2.setStyle(lineStyleArrow)
 arc_surface = new ArcSurface3D(1, 0.0, 1.0, new THREE.Vector3(0.0, 0.0, 0.0), new THREE.Vector3(0.0, 0.0, 0.0), 0xff6361);
 
-starphi =0.0;
 starpos = new THREE.Spherical(1.0, 1.0, 0.0);
 star = new Star(new THREE.Vector3(0.0, 0.0,0.0), 0xff6361);
+
+var midpoint = new THREE.Vector3(0.0, Math.cos(1.0), 0.0);
+midpoint.applyAxisAngle(new THREE.Vector3(-1.0, 0.0, 0.0), 0.5);
+
+
+orbit = new Circle3D(Math.sin(1.0), midpoint, new THREE.Vector3(0.0, Math.cos(-0.5), Math.sin(-0.5)));
+orbit.setStyle(lineStyleOrbit);
+scene.add(orbit.mesh)
 
 scene.add(arc.mesh)
 scene.add(star.mesh)
@@ -148,11 +158,18 @@ var animate = function () {
     arc_new.setStyle(lineStyleArrow)
     arc_surface_new = new ArcSurface3D(1, 0.0, Math.PI/2 - starpos_kk.phi, new THREE.Vector3(0.0, 0.0, 0.0), new THREE.Vector3(-Math.cos(starpos_kk.theta), 0.0, Math.sin(starpos_kk.theta)), 0xff6361);
 
+
+    var arc_new2 = new Arc3D(1, -Math.PI/2, -Math.PI/2 + starpos_kk.theta, new THREE.Vector3(0.0, 0.0, 0.0), new THREE.Vector3(0.0, 1.0, 0.0));
+    arc_new2.setStyle(lineStyleArrow);
+
     scene.remove(arc.mesh);
     scene.remove(arc_surface.mesh);
+    scene.remove(arc2.mesh);
     arc.mesh = arc_new.mesh;
+    arc2.mesh = arc_new2.mesh;
     arc_surface.mesh = arc_surface_new.mesh;
     scene.add(arc.mesh);
+    scene.add(arc2.mesh)
     scene.add(arc_surface.mesh);
 
 
