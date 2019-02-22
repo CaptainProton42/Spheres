@@ -1,3 +1,15 @@
+// Helpful constants.
+DEG_TO_RAD = 2 * Math.PI / 360;
+
+// Simulation parameters.
+latitude = 50; /* latitude of observer in degrees */
+declination = 30.0 * DEG_TO_RAD; /* declination of the star */
+
+// Useful values. Do not touch.
+angle_to_north_pole = ( 90.0 - latitude ) * DEG_TO_RAD; /* angle between current latitude and north pole. */
+
+
+// Declare scenbe.
 var scene = new THREE.Scene();
 
 // Comnfigure camera.
@@ -36,13 +48,6 @@ ZN = new Line3D(new THREE.Vector3(0.0, -1.0, 0.0), new THREE.Vector3(0.0, 1.0, 0
 NS = new Line3D(new THREE.Vector3(0.0, 0.0, 1.0), new THREE.Vector3(0.0, 0.0, -1.0));
 WE = new Line3D(new THREE.Vector3(-1.0, 0.0, 0.0), new THREE.Vector3(1.0, 0.0, 0.0));
 
-// Set styles.
-horizon.setStyle(lineStyle1);
-meridian.setStyle(lineStyle2);
-ZN.setStyle(lineStyleLight);
-NS.setStyle(lineStyleLight);
-WE.setStyle(lineStyleLight);
-
 // 3D surfaces.
 horizonDisc = new DiscSurface3D(1, new THREE.Vector3(0.0, 0.0, 0.0), new THREE.Vector3(0.0, 1.0, 0.0), 0x003f5c);
 meridianDisc = new DiscSurface3D(1, new THREE.Vector3(0.0, 0.0, 0.0), new THREE.Vector3(1.0, 0.0, 0.0), 0xffa600);
@@ -64,6 +69,19 @@ ELabel = new FlatText(new THREE.Vector3(1.3, 0.0, 0.0), new THREE.Vector3(0.0, 1
 zenithLabel = new FlatText(new THREE.Vector3(0.0, 1.2, 0.0), new THREE.Vector3(0.0, 0.0, -1.0), 0.0, 0.1, "Zenith", 0x666666);
 nadirLabel = new FlatText(new THREE.Vector3(0.0, -1.2, 0.0), new THREE.Vector3(0.0, 0.0, -1.0), 0.0, 0.1, "Nadir", 0x666666);
 
+// Star and its "orbit".
+star = new Star(new THREE.Vector3(0.0, 0.0,0.0), 0xff6361);
+var midpoint = new THREE.Vector3(0.0, Math.cos(angle_to_north_pole) * Math.sin(declination), -Math.sin(angle_to_north_pole) * Math.sin(declination));
+orbit = new Circle3D(Math.cos(declination), midpoint, new THREE.Vector3(0.0, Math.cos(-angle_to_north_pole), Math.sin(-angle_to_north_pole)));
+
+// Set styles.
+horizon.setStyle(lineStyle1);
+meridian.setStyle(lineStyle2);
+ZN.setStyle(lineStyleLight);
+NS.setStyle(lineStyleLight);
+WE.setStyle(lineStyleLight);
+orbit.setStyle(lineStyleOrbit);
+
 // Add meshes to scene.
 scene.add(horizon.getMesh());
 scene.add(meridian.getMesh());
@@ -72,10 +90,24 @@ scene.add(NS.getMesh());
 scene.add(WE.getMesh());
 scene.add(horizonDisc.getMesh());
 scene.add(meridianDisc.getMesh());
+scene.add(S.getMesh());
+scene.add(N.getMesh());
+scene.add(W.getMesh());
+scene.add(E.getMesh());
+scene.add(zenith.getMesh());
+scene.add(nadir.getMesh());
+scene.add(titleLabel.getMesh());
+scene.add(SLabel.getMesh());
+scene.add(NLabel.getMesh());
+scene.add(WLabel.getMesh());
+scene.add(ELabel.getMesh());
+scene.add(zenithLabel.getMesh());
+scene.add(nadirLabel.getMesh());
+scene.add(star.getMesh());
+scene.add(orbit.getMesh());
 
 
 // TODO: tydiing up everything below here
-S = new DirectionMarker(new THREE.Vector3(0.0, 0.0, 1.1), new THREE.Vector3(0.0, 0.0, 1.0), 0.1, 0x666666);
 
 arc = new Arc3D(1, 0.0, 1.0, new THREE.Vector3(0.0, 0.0, 0.0), new THREE.Vector3(0.0, -Math.PI, Math.PI/2));
 arc2 = new Arc3D(1, 0.0, 1.0, new THREE.Vector3(0.0, 0.0, 0.0), new THREE.Vector3(0.0, -Math.PI, Math.PI/2));
@@ -83,26 +115,12 @@ arc.setStyle(lineStyleArrow)
 arc2.setStyle(lineStyleArrow)
 arc_surface = new ArcSurface3D(1, 0.0, 1.0, new THREE.Vector3(0.0, 0.0, 0.0), new THREE.Vector3(0.0, 0.0, 0.0), 0xff6361);
 
-starpos = new THREE.Spherical(1.0, 1.0, 0.0);
-star = new Star(new THREE.Vector3(0.0, 0.0,0.0), 0xff6361);
+starpos = new THREE.Spherical(1.0, Math.PI/2 - declination, 0.0);
 
-var midpoint = new THREE.Vector3(0.0, Math.cos(1.0), 0.0);
 midpoint.applyAxisAngle(new THREE.Vector3(-1.0, 0.0, 0.0), 0.5);
 
 
-orbit = new Circle3D(Math.sin(1.0), midpoint, new THREE.Vector3(0.0, Math.cos(-0.5), Math.sin(-0.5)));
-orbit.setStyle(lineStyleOrbit);
-scene.add(orbit.mesh)
-
 scene.add(arc.mesh)
-scene.add(star.mesh)
-scene.add(S.mesh)
-scene.add(zenith.mesh)
-scene.add(W.mesh)
-scene.add(E.mesh)
-scene.add(S.mesh)
-scene.add(N.mesh)
-scene.add(nadir.mesh)
 
 var loader = new THREE.GLTFLoader();
 
@@ -120,30 +138,16 @@ loader.load( 'models/observer.glb', function ( gltf ) {
 
 } );
 
-var star_loaded = false;
 
 var animate = function () {
     requestAnimationFrame( animate );
 
     controls.update();
-
-    scene.add(SLabel.mesh) // hacky
-    scene.add(NLabel.mesh)
-    scene.add(ELabel.mesh)
-    scene.add(WLabel.mesh)
-    scene.add(zenithLabel.mesh);
-    scene.add(nadirLabel.mesh)
-    scene.add(titleLabel.mesh)
-
-    if (!star_loaded && star.mesh)
-    {
-        scene.add(star.mesh)
-    }
     
     starpos.theta -= 0.01;
     var euclidian = new THREE.Vector3();
     euclidian.setFromSpherical(starpos);
-    euclidian.applyAxisAngle(new THREE.Vector3(-1.0, 0.0, 0.0), 0.5);
+    euclidian.applyAxisAngle(new THREE.Vector3(-1.0, 0.0, 0.0), angle_to_north_pole);
 
     star.mesh.position.x = euclidian.x;
     star.mesh.position.y = euclidian.y;

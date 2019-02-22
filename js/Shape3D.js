@@ -20,8 +20,12 @@ class Star extends Shape3D {
 
             var geometry =  gltf.scene.children[0].geometry;
             var material = new THREE.MeshBasicMaterial( { color: color } );
-            var mesh = new THREE.Mesh( geometry, material );
-            parent.mesh = mesh;
+
+            parent.mesh.geometry = geometry;
+            parent.mesh.material = material;
+            parent.mesh.position.x = position.x;
+            parent.mesh.position.y = position.y;
+            parent.mesh.position.z = position.z;
 
         }, undefined, function ( error ) {
 
@@ -137,8 +141,6 @@ class FlatText extends Shape3D {
             geometry.center();
 
             var material = new THREE.MeshBasicMaterial( {color: color , side: THREE.DoubleSide } );
-
-            var mesh = new THREE.Mesh( geometry, material );
     
             var n1 = new THREE.Vector3(0.0, 0.0, 1.0);
         
@@ -150,12 +152,13 @@ class FlatText extends Shape3D {
     
             matrix.makeRotationFromQuaternion( quaternion );
     
-            mesh.applyMatrix( matrix );
-            mesh.rotation.z += angle;
-            mesh.position.x = position.x;
-            mesh.position.y = position.y;
-            mesh.position.z = position.z;
-            parent.mesh = mesh;
+            parent.mesh.applyMatrix( matrix );
+            parent.mesh.rotation.z += angle;
+            parent.mesh.position.x = position.x;
+            parent.mesh.position.y = position.y;
+            parent.mesh.position.z = position.z;
+            parent.mesh.geometry = geometry;
+            parent.mesh.material = material;
         } );
     }
 }
