@@ -1,5 +1,5 @@
 class LineStyle3D {
-    constructor(width, color, arrow) {
+    constructor(width = "1", color = 0x000000, arrow = false) {
         this.width = width;
         this.color = color;
         this.arrow = arrow;
@@ -25,7 +25,7 @@ class Path3D {
         var geometry = new THREE.TubeGeometry(this.curve, 64, this.linestyle.width, 16, false);
         // Create the line material
         var material = new THREE.MeshBasicMaterial( {
-            color: this.linestyle.color,
+            color: this.linestyle.color
         });
 
         if (this.linestyle.arrow) {

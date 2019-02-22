@@ -139,10 +139,8 @@ var animate = function () {
     {
         scene.add(star.mesh)
     }
-
     
     starpos.theta -= 0.01;
-
     var euclidian = new THREE.Vector3();
     euclidian.setFromSpherical(starpos);
     euclidian.applyAxisAngle(new THREE.Vector3(-1.0, 0.0, 0.0), 0.5);
@@ -151,12 +149,15 @@ var animate = function () {
     star.mesh.position.y = euclidian.y;
     star.mesh.position.z = euclidian.z;
 
+
     var starpos_kk = new THREE.Spherical(0.0, 0.0, 0.0);
     starpos_kk.setFromCartesianCoords(euclidian.x,euclidian.y, euclidian.z);
 
-    var arc_new = new Arc3D(1, 0.0, Math.PI/2 - starpos_kk.phi, new THREE.Vector3(0.0, 0.0, 0.0), new THREE.Vector3(-Math.cos(starpos_kk.theta), 0.0, Math.sin(starpos_kk.theta)));
+    var normalvec = new THREE.Vector3(-Math.cos(starpos_kk.theta), 0.0, Math.sin(starpos_kk.theta));
+
+    var arc_new = new Arc3D(1, 0.0, Math.PI/2 - starpos_kk.phi, new THREE.Vector3(0.0, 0.0, 0.0), normalvec);
     arc_new.setStyle(lineStyleArrow)
-    arc_surface_new = new ArcSurface3D(1, 0.0, Math.PI/2 - starpos_kk.phi, new THREE.Vector3(0.0, 0.0, 0.0), new THREE.Vector3(-Math.cos(starpos_kk.theta), 0.0, Math.sin(starpos_kk.theta)), 0xff6361);
+    arc_surface_new = new ArcSurface3D(1, 0.0, Math.PI/2 - starpos_kk.phi, new THREE.Vector3(0.0, 0.0, 0.0), normalvec, 0xff6361);
 
 
     var arc_new2 = new Arc3D(1, -Math.PI/2, -Math.PI/2 + starpos_kk.theta, new THREE.Vector3(0.0, 0.0, 0.0), new THREE.Vector3(0.0, 1.0, 0.0));
@@ -171,10 +172,6 @@ var animate = function () {
     scene.add(arc.mesh);
     scene.add(arc2.mesh)
     scene.add(arc_surface.mesh);
-
-
-
-
 
     renderer.render( scene, camera );
 };
