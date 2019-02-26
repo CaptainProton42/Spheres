@@ -57,10 +57,12 @@ class Path3D {
             geometry.merge(arrow, transform);
         }
 
-        this.mesh = new THREE.Mesh( geometry, material );
+        var yAxis = new THREE.Vector3();
+        var xAxis = new THREE.Vector3();
+        var zAxis = new THREE.Vector3();
+        this.mesh.matrix.extractBasis(xAxis, yAxis, zAxis);
 
-
-        var n1 = new THREE.Vector3(0.0, 0.0, 1.0);
+        var n1 = zAxis;
 
         var quaternion = new THREE.Quaternion(); // create one and reuse it
 
@@ -70,11 +72,16 @@ class Path3D {
 
         matrix.makeRotationFromQuaternion( quaternion );
 
+        this.mesh.material = material;
+        this.mesh.geometry = geometry;
+
         this.mesh.applyMatrix( matrix );
+        //this.mesh.applyQuaternion(quaternion);
 
         this.mesh.position.x = this.position.x;
         this.mesh.position.y = this.position.y;
         this.mesh.position.z = this.position.z;
+
     };
 
     getMesh() {

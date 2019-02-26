@@ -125,15 +125,11 @@ scene.add(horizonSystem);
 
 // TODO: tydiing up everything below here
 
-arc = new Arc3D(1, 0.0, 1.0, new THREE.Vector3(0.0, 0.0, 0.0), new THREE.Vector3(0.0, -Math.PI, Math.PI/2));
-arc2 = new Arc3D(1, 0.0, 1.0, new THREE.Vector3(0.0, 0.0, 0.0), new THREE.Vector3(0.0, -Math.PI, Math.PI/2));
+arc = new Arc3D(1, 0.0, 1.0, new THREE.Vector3(0.0, 0.0, 0.0), new THREE.Vector3(0.0, 1.0, 0.0));
+arc2 = new Arc3D(1, 0.0, 1.0, new THREE.Vector3(0.0, 0.0, 0.0), new THREE.Vector3(1.0, 0.0, 0.0));
 arc.setStyle(lineStyleArrow)
 arc2.setStyle(lineStyleArrow)
 arc_surface = new ArcSurface3D(1, 0.0, 1.0, new THREE.Vector3(0.0, 0.0, 0.0), new THREE.Vector3(0.0, 0.0, 0.0), 0xff6361);
-
-starpos = new THREE.Spherical(1.0, Math.PI/2 - declination, 0.0);
-
-midpoint.applyAxisAngle(new THREE.Vector3(-1.0, 0.0, 0.0), 0.5);
 
 
 scene.add(arc.mesh)
@@ -161,28 +157,27 @@ var animate = function () {
     requestAnimationFrame( animate );
 
     controls.update();
-
+    
     var delta = clock.getDelta();
 
     var deltatheta = 0.01 * delta / 0.016;
     starSystem.rotateY(-deltatheta);
-    
-    starpos.theta -= deltatheta;
-    var euclidian = new THREE.Vector3();
-    euclidian.setFromSpherical(starpos);
-    euclidian.applyAxisAngle(new THREE.Vector3(-1.0, 0.0, 0.0), angle_to_north_pole);
 
+    var starpos = new THREE.Vector3();
+    starSystem.children[0].getWorldPosition(starpos);
     var starpos_kk = new THREE.Spherical(0.0, 0.0, 0.0);
-    starpos_kk.setFromCartesianCoords(euclidian.x,euclidian.y, euclidian.z);
+    starpos_kk.setFromCartesianCoords(starpos.x,starpos.y, starpos.z);
 
     var normalvec = new THREE.Vector3(-Math.cos(starpos_kk.theta), 0.0, Math.sin(starpos_kk.theta));
 
     scene.remove(arc.mesh);
     scene.remove(arc2.mesh);
-    arc.update(1, 0.0, Math.PI/2 - starpos_kk.phi, new THREE.Vector3(0.0, 0.0, 0.0), normalvec);
-    arc2.update(1, -Math.PI/2, -Math.PI/2 + starpos_kk.theta, new THREE.Vector3(0.0, 0.0, 0.0), new THREE.Vector3(0.0, 1.0, 0.0));
+    arc.update(1, -Math.PI/2, - starpos_kk.phi, new THREE.Vector3(0.0, 0.0, 0.0), normalvec);
+    arc2.update(1, Math.PI, Math.PI + starpos_kk.theta, new THREE.Vector3(0.0, 0.0, 0.0), new THREE.Vector3(0.0, 1.0, 0.0));
+    arc_surface.updateMesh(1, 0.0, Math.PI/2 - starpos_kk.phi, new THREE.Vector3(0.0, 0.0, 0.0), normalvec, 0xff6361);
     scene.add(arc.mesh);
     scene.add(arc2.mesh);
+    
 
     renderer.render( scene, camera );
 };
