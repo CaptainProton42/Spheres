@@ -34,7 +34,7 @@ class Path3D {
             var arrowlen = 2 * arrowwidth;
 
             // create arrow geometry
-            var arrow = new THREE.ConeGeometry(arrowwidth, arrowlen, 32);
+            var arrow = new THREE.ConeGeometry(arrowwidth, arrowlen, 16);
 
             // transformation and rotation matrices for arrow placement
             var transform = new THREE.Matrix4();
@@ -76,7 +76,6 @@ class Path3D {
         this.mesh.geometry = geometry;
 
         this.mesh.applyMatrix( matrix );
-        //this.mesh.applyQuaternion(quaternion);
 
         this.mesh.position.x = this.position.x;
         this.mesh.position.y = this.position.y;
