@@ -33,6 +33,10 @@ controls.enableZoom = false;
 controls.enableDamping = true;
 controls.rotateSpeed = 0.25;
 
+// Add clock. Used to retrieve delta time.
+clock = new THREE.Clock()
+clock.start();
+
 // Line styles. Colors taken from https://learnui.design/tools/data-color-picker.html
 lineStyle1 = new LineStyle3D(0.005, 0x003f5c);
 lineStyle2 = new LineStyle3D(0.005, 0xffa600);
@@ -158,9 +162,12 @@ var animate = function () {
 
     controls.update();
 
-    starSystem.rotateY(-0.01);
+    var delta = clock.getDelta();
+
+    var deltatheta = 0.01 * delta / 0.016;
+    starSystem.rotateY(-deltatheta);
     
-    starpos.theta -= 0.01;
+    starpos.theta -= deltatheta;
     var euclidian = new THREE.Vector3();
     euclidian.setFromSpherical(starpos);
     euclidian.applyAxisAngle(new THREE.Vector3(-1.0, 0.0, 0.0), angle_to_north_pole);
@@ -176,25 +183,6 @@ var animate = function () {
     arc2.update(1, -Math.PI/2, -Math.PI/2 + starpos_kk.theta, new THREE.Vector3(0.0, 0.0, 0.0), new THREE.Vector3(0.0, 1.0, 0.0));
     scene.add(arc.mesh);
     scene.add(arc2.mesh);
-
-    /*var arc_new = new Arc3D(1, 0.0, Math.PI/2 - starpos_kk.phi, new THREE.Vector3(0.0, 0.0, 0.0), normalvec);
-    arc_new.setStyle(lineStyleArrow)
-    arc_surface_new = new ArcSurface3D(1, 0.0, Math.PI/2 - starpos_kk.phi, new THREE.Vector3(0.0, 0.0, 0.0), normalvec, 0xff6361);
-
-
-    var arc_new2 = new Arc3D(1, -Math.PI/2, -Math.PI/2 + starpos_kk.theta, new THREE.Vector3(0.0, 0.0, 0.0), new THREE.Vector3(0.0, 1.0, 0.0));
-    arc_new2.setStyle(lineStyleArrow);
-
-    scene.remove(arc.mesh);
-    scene.remove(arc_surface.mesh);
-    scene.remove(arc2.mesh);
-    arc.mesh = arc_new.mesh;
-    arc2.mesh = arc_new2.mesh;
-    arc_surface.mesh = arc_surface_new.mesh;
-    scene.add(arc.mesh);
-    scene.add(arc2.mesh)
-    scene.add(arc_surface.mesh);
-    */
 
     renderer.render( scene, camera );
 };
