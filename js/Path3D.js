@@ -85,6 +85,10 @@ class Path3D {
 class GeometryPath3D extends Path3D {
     constructor( path ) {
         super();
+        this.update(path);
+    }
+
+    update(path) {
         this.path = path;
         this.updateMesh();
     }
@@ -93,6 +97,10 @@ class GeometryPath3D extends Path3D {
 class Circle3D extends Path3D {
     constructor(radius, position, normal) {
         super();
+        this.update(radius, position, normal);
+    }
+
+    update(radius, position, normal) {
         this.curve = new Circle( radius );
         this.position = position;
         this.normal = normal;
@@ -103,10 +111,14 @@ class Circle3D extends Path3D {
 class Arc3D extends Path3D {
     constructor(radius, phi1, phi2, position, normal) {
         super();
+        this.update(radius, phi1, phi2, position, normal)
+    }
+
+    update(radius, phi1, phi2, position, normal) {
         this.curve = new Arc(radius, phi1, phi2); 
         this.position = position;
         this.normal = normal;  
-        this.updateMesh();
+        this.updateMesh();        
     }
 }
 

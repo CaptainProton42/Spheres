@@ -70,9 +70,11 @@ zenithLabel = new FlatText(new THREE.Vector3(0.0, 1.2, 0.0), new THREE.Vector3(0
 nadirLabel = new FlatText(new THREE.Vector3(0.0, -1.2, 0.0), new THREE.Vector3(0.0, 0.0, -1.0), 0.0, 0.1, "Nadir", 0x666666);
 
 // Star and its "orbit".
-star = new Star(new THREE.Vector3(0.0, 0.0,0.0), 0xff6361);
-var midpoint = new THREE.Vector3(0.0, Math.cos(angle_to_north_pole) * Math.sin(declination), -Math.sin(angle_to_north_pole) * Math.sin(declination));
-orbit = new Circle3D(Math.cos(declination), midpoint, new THREE.Vector3(0.0, Math.cos(-angle_to_north_pole), Math.sin(-angle_to_north_pole)));
+var height = Math.sin(declination);
+var radius = Math.cos(declination);
+star = new Star(new THREE.Vector3(0.0, height, radius), 0xff6361);
+var midpoint = new THREE.Vector3(0.0, height, 0.0);
+orbit = new Circle3D(radius, midpoint, new THREE.Vector3(0.0, 1.0, 0.0));
 
 // Set styles.
 horizon.setStyle(lineStyle1);
@@ -82,29 +84,39 @@ NS.setStyle(lineStyleLight);
 WE.setStyle(lineStyleLight);
 orbit.setStyle(lineStyleOrbit);
 
+// Horizon System
+var horizonSystem = new THREE.Group();
+horizonSystem.add(horizon.getMesh());
+horizonSystem.add(meridian.getMesh());
+horizonSystem.add(ZN.getMesh());
+horizonSystem.add(NS.getMesh());
+horizonSystem.add(WE.getMesh());
+horizonSystem.add(horizonDisc.getMesh());
+horizonSystem.add(meridianDisc.getMesh());
+horizonSystem.add(S.getMesh());
+horizonSystem.add(N.getMesh());
+horizonSystem.add(W.getMesh());
+horizonSystem.add(E.getMesh());
+horizonSystem.add(zenith.getMesh());
+horizonSystem.add(nadir.getMesh());
+horizonSystem.add(SLabel.getMesh());
+horizonSystem.add(NLabel.getMesh());
+horizonSystem.add(WLabel.getMesh());
+horizonSystem.add(ELabel.getMesh());
+horizonSystem.add(zenithLabel.getMesh());
+horizonSystem.add(nadirLabel.getMesh());
+
+// Star
+var starSystem = new THREE.Group();
+starSystem.add(star.getMesh());
+starSystem.add(orbit.getMesh());
+starSystem.rotation.x = -angle_to_north_pole;
+
+
 // Add meshes to scene.
-scene.add(horizon.getMesh());
-scene.add(meridian.getMesh());
-scene.add(ZN.getMesh());
-scene.add(NS.getMesh());
-scene.add(WE.getMesh());
-scene.add(horizonDisc.getMesh());
-scene.add(meridianDisc.getMesh());
-scene.add(S.getMesh());
-scene.add(N.getMesh());
-scene.add(W.getMesh());
-scene.add(E.getMesh());
-scene.add(zenith.getMesh());
-scene.add(nadir.getMesh());
 scene.add(titleLabel.getMesh());
-scene.add(SLabel.getMesh());
-scene.add(NLabel.getMesh());
-scene.add(WLabel.getMesh());
-scene.add(ELabel.getMesh());
-scene.add(zenithLabel.getMesh());
-scene.add(nadirLabel.getMesh());
-scene.add(star.getMesh());
-scene.add(orbit.getMesh());
+scene.add(starSystem)
+scene.add(horizonSystem);
 
 
 // TODO: tydiing up everything below here
@@ -121,6 +133,8 @@ midpoint.applyAxisAngle(new THREE.Vector3(-1.0, 0.0, 0.0), 0.5);
 
 
 scene.add(arc.mesh)
+scene.add(arc2.mesh)
+scene.add(arc_surface.mesh)
 
 var loader = new THREE.GLTFLoader();
 
@@ -143,23 +157,27 @@ var animate = function () {
     requestAnimationFrame( animate );
 
     controls.update();
+
+    starSystem.rotateY(-0.01);
     
     starpos.theta -= 0.01;
     var euclidian = new THREE.Vector3();
     euclidian.setFromSpherical(starpos);
     euclidian.applyAxisAngle(new THREE.Vector3(-1.0, 0.0, 0.0), angle_to_north_pole);
 
-    star.mesh.position.x = euclidian.x;
-    star.mesh.position.y = euclidian.y;
-    star.mesh.position.z = euclidian.z;
-
-
     var starpos_kk = new THREE.Spherical(0.0, 0.0, 0.0);
     starpos_kk.setFromCartesianCoords(euclidian.x,euclidian.y, euclidian.z);
 
     var normalvec = new THREE.Vector3(-Math.cos(starpos_kk.theta), 0.0, Math.sin(starpos_kk.theta));
 
-    var arc_new = new Arc3D(1, 0.0, Math.PI/2 - starpos_kk.phi, new THREE.Vector3(0.0, 0.0, 0.0), normalvec);
+    scene.remove(arc.mesh);
+    scene.remove(arc2.mesh);
+    arc.update(1, 0.0, Math.PI/2 - starpos_kk.phi, new THREE.Vector3(0.0, 0.0, 0.0), normalvec);
+    arc2.update(1, -Math.PI/2, -Math.PI/2 + starpos_kk.theta, new THREE.Vector3(0.0, 0.0, 0.0), new THREE.Vector3(0.0, 1.0, 0.0));
+    scene.add(arc.mesh);
+    scene.add(arc2.mesh);
+
+    /*var arc_new = new Arc3D(1, 0.0, Math.PI/2 - starpos_kk.phi, new THREE.Vector3(0.0, 0.0, 0.0), normalvec);
     arc_new.setStyle(lineStyleArrow)
     arc_surface_new = new ArcSurface3D(1, 0.0, Math.PI/2 - starpos_kk.phi, new THREE.Vector3(0.0, 0.0, 0.0), normalvec, 0xff6361);
 
@@ -176,6 +194,7 @@ var animate = function () {
     scene.add(arc.mesh);
     scene.add(arc2.mesh)
     scene.add(arc_surface.mesh);
+    */
 
     renderer.render( scene, camera );
 };
