@@ -18,15 +18,20 @@ class Path3D {
 
     setStyle(linestyle) {
         this.linestyle = linestyle;
-        this.updateMesh();
+        this.updateGeometry();
+        this.updateMaterial();
     };
 
-    updateMesh() {
-        var geometry = new THREE.TubeGeometry(this.curve, 64, this.linestyle.width, 16, false);
-        // Create the line material
+    updateMaterial() {
         var material = new THREE.MeshBasicMaterial( {
             color: this.linestyle.color
         });
+        this.mesh.material = material;
+    }
+
+    updateGeometry() {
+        var geometry = new THREE.TubeGeometry(this.curve, 64, this.linestyle.width, 16, false);
+        // Create the line material
 
         if (this.linestyle.arrow) {
             // arrow style
@@ -72,7 +77,6 @@ class Path3D {
 
         matrix.makeRotationFromQuaternion( quaternion );
 
-        this.mesh.material = material;
         this.mesh.geometry = geometry;
 
         this.mesh.applyMatrix( matrix );
@@ -92,11 +96,12 @@ class GeometryPath3D extends Path3D {
     constructor( path ) {
         super();
         this.update(path);
+        this.updateMaterial();
     }
 
     update(path) {
         this.path = path;
-        this.updateMesh();
+        this.updateGeometry();
     }
 }
 
@@ -104,27 +109,29 @@ class Circle3D extends Path3D {
     constructor(radius, position, normal) {
         super();
         this.update(radius, position, normal);
+        this.updateMaterial();
     }
 
     update(radius, position, normal) {
         this.curve = new Circle( radius );
         this.position = position;
         this.normal = normal;
-        this.updateMesh();
+        this.updateGeometry();
     }
 }
 
 class Arc3D extends Path3D {
     constructor(radius, phi1, phi2, position, normal) {
         super();
-        this.update(radius, phi1, phi2, position, normal)
+        this.update(radius, phi1, phi2, position, normal);
+        this.updateMaterial();
     }
 
     update(radius, phi1, phi2, position, normal) {
         this.curve = new Arc(radius, phi1, phi2); 
         this.position = position;
         this.normal = normal;  
-        this.updateMesh();        
+        this.updateGeometry();        
     }
 }
 
