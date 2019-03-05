@@ -132,13 +132,13 @@ equatorialSystem.add(equatorDisc.getMesh());
 equatorialSystem.add(pole.getMesh());
 equatorialSystem.add(poleLabel.getMesh());
 equatorialSystem.add(rightAscensionVector.getMesh());
+equatorialSystem.add(declinationVector.getMesh());
 equatorialSystem.rotation.x = -angle_to_north_pole;
 
 // Star
 var starSystem = new THREE.Group();
 starSystem.add(star.getMesh());
 starSystem.add(orbit.getMesh());
-starSystem.add(declinationVector.getMesh());
 starSystem.rotation.x = -angle_to_north_pole;
 
 
@@ -246,6 +246,7 @@ var animate = function () {
     }
 
     starSystem.rotateY(-deltatheta);
+    declinationVector.getMesh().rotateY(-deltatheta);
 
     var starpos = new THREE.Vector3();
     starSystem.children[0].getWorldPosition(starpos);
@@ -260,9 +261,9 @@ var animate = function () {
 
     arc.update(1, -Math.PI/2, - starpos_kk.phi, new THREE.Vector3(0.0, 0.0, 0.0), normalvec);
     arc2.update(1, Math.PI, Math.PI + starpos_kk.theta, new THREE.Vector3(0.0, 0.0, 0.0), new THREE.Vector3(0.0, 1.0, 0.0));
-    //arc_surface.updateMesh(1, 0.0, Math.PI/2 - starpos_kk.phi, new THREE.Vector3(0.0, 0.0, 0.0), normalvec, 0xff6361);
+    arc_surface.updateMesh(1, 0.0, Math.PI/2 - starpos_kk.phi, new THREE.Vector3(0.0, 0.0, 0.0), normalvec, 0xff6361);
 
-    //rightAscensionVector.update(1, -Math.PI/2, -Math.PI/2-rightAscension, new THREE.Vector3(0.0, 0.0, 0.0), new THREE.Vector3(0.0, 1.0, 0.0));
+    rightAscensionVector.update(1, -Math.PI/2, -Math.PI/2-rightAscension, new THREE.Vector3(0.0, 0.0, 0.0), new THREE.Vector3(0.0, 1.0, 0.0));
 
     renderer.render( scene, camera );
 };
