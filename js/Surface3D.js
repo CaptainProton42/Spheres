@@ -14,7 +14,7 @@ class DiscSurface3D extends Surface3D {
         super();
 
         var geometry = new THREE.CircleGeometry( radius, 64 );
-        var material = new THREE.MeshBasicMaterial( { color: color , opacity: 0.15, transparent: true, side: THREE.DoubleSide } );
+        var material = new THREE.MeshBasicMaterial( { color: color , opacity: 0.15, transparent: true, side: THREE.DoubleSide, depthWrite: false } );
 
         var mesh = new THREE.Mesh( geometry, material );
 
@@ -76,7 +76,7 @@ class ArcSurface3D extends Surface3D {
     }
 
     updateMesh(radius, phi1, phi2, position, normal, color) {
-        var material = new THREE.MeshBasicMaterial( { color: color , opacity: 0.15, transparent: true, side: THREE.DoubleSide } );
+        var material = new THREE.MeshBasicMaterial( { color: color , opacity: 0.15, transparent: true, side: THREE.DoubleSide, depthWrite: false } );
 
         var shape = new THREE.Shape();
         if (phi2 > phi1 ) {
@@ -104,6 +104,8 @@ class ArcSurface3D extends Surface3D {
 
         matrix.makeRotationFromQuaternion( quaternion );
 
+        this.mesh.geometry.dispose();
+        this.mesh.material.dispose();
         this.mesh.geometry = geometry;
         this.mesh.material = material;
 

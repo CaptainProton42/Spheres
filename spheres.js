@@ -110,8 +110,8 @@ horizonSystem.add(meridian.getMesh());
 horizonSystem.add(ZN.getMesh());
 horizonSystem.add(NS.getMesh());
 horizonSystem.add(WE.getMesh());
-//horizonSystem.add(horizonDisc.getMesh());
-//horizonSystem.add(meridianDisc.getMesh());
+horizonSystem.add(horizonDisc.getMesh());
+horizonSystem.add(meridianDisc.getMesh());
 horizonSystem.add(S.getMesh());
 horizonSystem.add(N.getMesh());
 horizonSystem.add(W.getMesh());
@@ -128,7 +128,7 @@ horizonSystem.add(nadirLabel.getMesh());
 // Equatorial System
 var equatorialSystem = new THREE.Group();
 equatorialSystem.add(equator.getMesh());
-//equatorialSystem.add(equatorDisc.getMesh());
+equatorialSystem.add(equatorDisc.getMesh());
 equatorialSystem.add(pole.getMesh());
 equatorialSystem.add(poleLabel.getMesh());
 equatorialSystem.add(rightAscensionVector.getMesh());
@@ -260,9 +260,9 @@ var animate = function () {
 
     arc.update(1, -Math.PI/2, - starpos_kk.phi, new THREE.Vector3(0.0, 0.0, 0.0), normalvec);
     arc2.update(1, Math.PI, Math.PI + starpos_kk.theta, new THREE.Vector3(0.0, 0.0, 0.0), new THREE.Vector3(0.0, 1.0, 0.0));
-    arc_surface.updateMesh(1, 0.0, Math.PI/2 - starpos_kk.phi, new THREE.Vector3(0.0, 0.0, 0.0), normalvec, 0xff6361);
+    //arc_surface.updateMesh(1, 0.0, Math.PI/2 - starpos_kk.phi, new THREE.Vector3(0.0, 0.0, 0.0), normalvec, 0xff6361);
 
-    rightAscensionVector.update(1, -Math.PI/2, -Math.PI/2-rightAscension, new THREE.Vector3(0.0, 0.0, 0.0), new THREE.Vector3(0.0, 1.0, 0.0));
+    //rightAscensionVector.update(1, -Math.PI/2, -Math.PI/2-rightAscension, new THREE.Vector3(0.0, 0.0, 0.0), new THREE.Vector3(0.0, 1.0, 0.0));
 
     renderer.render( scene, camera );
 };

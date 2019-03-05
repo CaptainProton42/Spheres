@@ -77,6 +77,7 @@ class Path3D {
 
         matrix.makeRotationFromQuaternion( quaternion );
 
+        this.mesh.geometry.dispose();
         this.mesh.geometry = geometry;
 
         this.mesh.applyMatrix( matrix );
