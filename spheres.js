@@ -154,12 +154,12 @@ arc = new Arc3D(1, 0.0, 1.0, new THREE.Vector3(0.0, 0.0, 0.0), new THREE.Vector3
 arc2 = new Arc3D(1, 0.0, 1.0, new THREE.Vector3(0.0, 0.0, 0.0), new THREE.Vector3(1.0, 0.0, 0.0));
 arc.setStyle(lineStyleArrow)
 arc2.setStyle(lineStyleArrow)
-arc_surface = new ArcSurface3D(1, 0.0, 1.0, new THREE.Vector3(0.0, 0.0, 0.0), new THREE.Vector3(0.0, 0.0, 0.0), 0xff6361);
+//arc_surface = new ArcSurface3D(1, 0.0, 1.0, new THREE.Vector3(0.0, 0.0, 0.0), new THREE.Vector3(0.0, 0.0, 0.0), 0xff6361);
 
 
 scene.add(arc.mesh)
 scene.add(arc2.mesh)
-scene.add(arc_surface.mesh)
+//scene.add(arc_surface.mesh)
 
 var loader = new THREE.GLTFLoader();
 
