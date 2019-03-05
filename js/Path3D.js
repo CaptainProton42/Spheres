@@ -53,7 +53,7 @@ class Path3D {
 
             // place arrow tip on curve end
             var arrow_pos = new THREE.Vector3();
-            arrow_pos = geometry.vertices[geometry.vertices.length-1];
+            arrow_pos = this.curve.getPointAt(1.0)
             arrow_pos = arrow_pos.add(tangent.multiplyScalar(-arrowlen/2));
 
             // apply transformations and merge
