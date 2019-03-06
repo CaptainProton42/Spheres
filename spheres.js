@@ -57,7 +57,7 @@ pole = new Line3D(new THREE.Vector3(0.0, 1.1, 0.0), new THREE.Vector3(0.0, 1.5, 
 
 // 3D surfaces.
 horizonDisc = new DiscSurface3D(1, new THREE.Vector3(0.0, 0.0, 0.0), new THREE.Vector3(0.0, 1.0, 0.0), 0x003f5c);
-meridianDisc = new DiscSurface3D(1, new THREE.Vector3(0.0, 0.0, 0.0), new THREE.Vector3(1.0, 0.0, 0.0), 0xffa600);
+meridianDisc = new DiscSurface3D(1, new THREE.Vector3(0.0, 0.0, 0.0), new THREE.Vector3(1.0, 0.0, 0.0), 0x666666);
 equatorDisc = new DiscSurface3D(1, new THREE.Vector3(0.0, 0.0, 0.0), new THREE.Vector3(0.0, 1.0, 0.0), 0xbc5090);
 
 // Markers.
@@ -95,7 +95,7 @@ altitudeVector = new Arc3D(1, 0.0, 1.0, new THREE.Vector3(0.0, 0.0, 0.0), new TH
 
 // Set styles.
 horizon.setStyle(lineStyle1);
-meridian.setStyle(lineStyle2);
+meridian.setStyle(lineStyleLight);
 ZN.setStyle(lineStyleLight);
 NS.setStyle(lineStyleLight);
 WE.setStyle(lineStyleLight);
@@ -111,22 +111,10 @@ rightAscensionVector.setStyle(lineStyleArrow2);
 var horizonSystem = new THREE.Group();
 horizonSystem.name = "Horizon System";
 horizonSystem.add(horizon.getMesh());
-horizonSystem.add(meridian.getMesh());
 horizonSystem.add(ZN.getMesh());
-horizonSystem.add(NS.getMesh());
-horizonSystem.add(WE.getMesh());
 horizonSystem.add(horizonDisc.getMesh());
-horizonSystem.add(meridianDisc.getMesh());
-horizonSystem.add(S.getMesh());
-horizonSystem.add(N.getMesh());
-horizonSystem.add(W.getMesh());
-horizonSystem.add(E.getMesh());
 horizonSystem.add(zenith.getMesh());
 horizonSystem.add(nadir.getMesh());
-horizonSystem.add(SLabel.getMesh());
-horizonSystem.add(NLabel.getMesh());
-horizonSystem.add(WLabel.getMesh());
-horizonSystem.add(ELabel.getMesh());
 horizonSystem.add(zenithLabel.getMesh());
 horizonSystem.add(nadirLabel.getMesh());
 horizonSystem.add(azimuthVector.getMesh());
@@ -150,11 +138,28 @@ starSystem.add(star.getMesh());
 starSystem.add(orbit.getMesh());
 starSystem.rotation.x = -angle_to_north_pole;
 
+// Reference points that should stay the same in both systems.
+var globalReference = new THREE.Group();
+globalReference.name = "Global Reference";
+globalReference.add(S.getMesh());
+globalReference.add(N.getMesh());
+globalReference.add(W.getMesh());
+globalReference.add(E.getMesh());
+globalReference.add(SLabel.getMesh());
+globalReference.add(NLabel.getMesh());
+globalReference.add(WLabel.getMesh());
+globalReference.add(ELabel.getMesh());
+globalReference.add(NS.getMesh());
+globalReference.add(WE.getMesh());
+globalReference.add(meridian.getMesh());
+globalReference.add(meridianDisc.getMesh());
+
 
 // Add meshes to scene.
 scene.add(starSystem);
 scene.add(equatorialSystem);
 scene.add(horizonSystem);
+scene.add(globalReference);
 
 // Models.
 
@@ -335,10 +340,11 @@ infoEquatorial.style.color = "#666666";
 infoEquatorial.style.position = 'absolute';
 infoEquatorial.style.width = 500;
 infoEquatorial.style.height = 800;
-infoEquatorial.innerHTML = "Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua.\
-                 At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet.\
-                 Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua.\
-                 At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet.";
+infoEquatorial.innerHTML = 'In the Equatorial System, the stars position is described by its <font color="#bc5090">hour angle</font> and <font color="#bc5090">declination</font>.\
+                            Like in the horizontal system, the hour angle starts at the south point on the equatorial horizon.<br>\
+                            At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet.\
+                            Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua.\
+                            At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet.';
 infoEquatorial.style.top = 20 + '%';
 infoEquatorial.style.left = 70 + '%';
 infoBoxEquatorial.appendChild(infoEquatorial);
@@ -393,24 +399,12 @@ var tweenHorizontalFadeOut = new TWEEN.Tween(opacityHorizontal)
     })
     .onUpdate(function() {
         horizon.mesh.material.opacity = opacityHorizontal.path;
-        meridian.mesh.material.opacity = opacityHorizontal.path;
         ZN.mesh.material.opacity = opacityHorizontal.path;
-        NS.mesh.material.opacity = opacityHorizontal.path;
-        WE.mesh.material.opacity = opacityHorizontal.path;
-        S.mesh.material.opacity = opacityHorizontal.path;
-        N.mesh.material.opacity = opacityHorizontal.path;
-        W.mesh.material.opacity = opacityHorizontal.path;
-        E.mesh.material.opacity = opacityHorizontal.path;
         zenith.mesh.material.opacity = opacityHorizontal.path;
         nadir.mesh.material.opacity = opacityHorizontal.path;
-        SLabel.mesh.material.opacity = opacityHorizontal.path;
-        NLabel.mesh.material.opacity = opacityHorizontal.path;
-        WLabel.mesh.material.opacity = opacityHorizontal.path;
-        ELabel.mesh.material.opacity = opacityHorizontal.path;
         zenithLabel.mesh.material.opacity = opacityHorizontal.path;
         nadirLabel.mesh.material.opacity = opacityHorizontal.path;
         horizonDisc.mesh.material.opacity = opacityHorizontal.surface;
-        meridianDisc.mesh.material.opacity = opacityHorizontal.surface;
         azimuthVector.mesh.material.opacity = opacityHorizontal.path;
         altitudeVector.mesh.material.opacity = opacityHorizontal.path;
         house.traverse( function (child)
@@ -434,24 +428,12 @@ var tweenHorizontalFadeIn = new TWEEN.Tween(opacityHorizontal)
     .easing(TWEEN.Easing.Quadratic.In)
     .onUpdate(function() {
         horizon.mesh.material.opacity = opacityHorizontal.path;
-        meridian.mesh.material.opacity = opacityHorizontal.path;
         ZN.mesh.material.opacity = opacityHorizontal.path;
-        NS.mesh.material.opacity = opacityHorizontal.path;
-        WE.mesh.material.opacity = opacityHorizontal.path;
-        S.mesh.material.opacity = opacityHorizontal.path;
-        N.mesh.material.opacity = opacityHorizontal.path;
-        W.mesh.material.opacity = opacityHorizontal.path;
-        E.mesh.material.opacity = opacityHorizontal.path;
         zenith.mesh.material.opacity = opacityHorizontal.path;
         nadir.mesh.material.opacity = opacityHorizontal.path;
-        SLabel.mesh.material.opacity = opacityHorizontal.path;
-        NLabel.mesh.material.opacity = opacityHorizontal.path;
-        WLabel.mesh.material.opacity = opacityHorizontal.path;
-        ELabel.mesh.material.opacity = opacityHorizontal.path;
         zenithLabel.mesh.material.opacity = opacityHorizontal.path;
         nadirLabel.mesh.material.opacity = opacityHorizontal.path;
         horizonDisc.mesh.material.opacity = opacityHorizontal.surface;
-        meridianDisc.mesh.material.opacity = opacityHorizontal.surface;
 
         azimuthVector.mesh.material.opacity = opacityHorizontal.path;
         altitudeVector.mesh.material.opacity = opacityHorizontal.path;
@@ -523,12 +505,14 @@ var tweenRotateToEquator = new TWEEN.Tween(worldRotation)
     .easing(TWEEN.Easing.Quadratic.Out)
     .onUpdate(function() {
         scene.rotation.x = worldRotation.value;
+        globalReference.rotation.x = -worldRotation.value;
     })
 var tweenRotateToHorizon = new TWEEN.Tween(worldRotation)
     .to( { value: 0.0 }, 500)
     .easing(TWEEN.Easing.Quadratic.Out)
     .onUpdate(function() {
         scene.rotation.x = worldRotation.value;
+        globalReference.rotation.x = -worldRotation.value;
     })
 
 // Setup raycasting (taken directly from the three.js documentation).
