@@ -69,7 +69,6 @@ zenith = new Dot3D(new THREE.Vector3(0.0, 1.0, 0.0), 0.05, 0x666666 );
 nadir = new Dot3D(new THREE.Vector3(0.0, -1.0, 0.0), 0.05, 0x666666 );
 
 // Labels.
-titleLabel = new FlatText(new THREE.Vector3(0.0, 2.0, 0.0), new THREE.Vector3(0.0, 0.0, -1.0), 0.0, 0.2, "Celestial Coordinate Systems", 0xaaaaaa);
 SLabel = new FlatText(new THREE.Vector3(0.0, 0.0, 1.3), new THREE.Vector3(0.0, 1.0, 0.0), Math.PI, 0.1, "S", 0x666666);
 NLabel = new FlatText(new THREE.Vector3(0.0, 0.0, -1.3), new THREE.Vector3(0.0, 1.0, 0.0), 0.0, 0.1, "N", 0x666666);
 WLabel = new FlatText(new THREE.Vector3(-1.3, 0.0, 0.0), new THREE.Vector3(0.0, 1.0, 0.0), Math.PI/2, 0.1, "W", 0x666666);
@@ -153,14 +152,15 @@ starSystem.rotation.x = -angle_to_north_pole;
 
 
 // Add meshes to scene.
-scene.add(titleLabel.getMesh());
 scene.add(starSystem);
 scene.add(equatorialSystem);
 scene.add(horizonSystem);
 
 // Models.
+
 var loader = new THREE.GLTFLoader();
 
+var observer = new THREE.Object3D();
 loader.load( 'models/observer.glb', function ( gltf ) {
     var material = new THREE.MeshBasicMaterial( { color: 0x666666 } );
     gltf.scene.traverse( function (child)
@@ -170,12 +170,14 @@ loader.load( 'models/observer.glb', function ( gltf ) {
             child.material = material;
         }
     });
-    horizonSystem.add(gltf.scene);
-
+    
+    observer = gltf.scene;
+    horizonSystem.add(observer);
 }, undefined, function ( error ) {
 	console.error( error );
 } );
 
+var house = new THREE.Object3D();
 loader.load( 'models/house.glb', function ( gltf ) {
     var material = new THREE.MeshBasicMaterial( { color: 0x666666 } );
     gltf.scene.traverse( function (child)
@@ -188,13 +190,16 @@ loader.load( 'models/house.glb', function ( gltf ) {
     gltf.scene.scale.set(3, 3, 3);
     gltf.scene.position.x = -0.3;
     gltf.scene.position.z = 0.3;
-    horizonSystem.add(gltf.scene);
+
+    house = gltf.scene;
+    horizonSystem.add(house);
 
 }, undefined, function ( error ) {
 
 	console.error( error );
 } );
 
+var tree = new THREE.Object3D();
 loader.load( 'models/tree.glb', function ( gltf ) {
     var material = new THREE.MeshBasicMaterial( { color: 0x666666 } );
     gltf.scene.traverse( function (child)
@@ -207,7 +212,8 @@ loader.load( 'models/tree.glb', function ( gltf ) {
     gltf.scene.scale.set(3, 3, 3);
     gltf.scene.position.x = -0.4;
     gltf.scene.position.z = 0.4;
-    horizonSystem.add(gltf.scene);
+    tree = gltf.scene;
+    horizonSystem.add(tree);
 
 }, undefined, function ( error ) {
 
@@ -367,6 +373,24 @@ var opacityHorizontal = { path:1, surface:0.15 }; // start at 1.0
 var tweenHorizontalFadeOut = new TWEEN.Tween(opacityHorizontal)
     .to({ path:0.05, surface:0.0 }, 500)  // change in 0.5 seconds
     .easing(TWEEN.Easing.Quadratic.Out)
+    .onStart(function() {
+        house.traverse( function (child)
+        {
+            if ( child instanceof THREE.Mesh )
+            {
+                child.material.transparent = true;
+                child.material.depthWrite = false;
+            }
+        });
+        tree.traverse( function (child)
+        {
+            if ( child instanceof THREE.Mesh )
+            {
+                child.material.transparent = true;
+                child.material.depthWrite = false;
+            }
+        });    
+    })
     .onUpdate(function() {
         horizon.mesh.material.opacity = opacityHorizontal.path;
         meridian.mesh.material.opacity = opacityHorizontal.path;
@@ -389,6 +413,20 @@ var tweenHorizontalFadeOut = new TWEEN.Tween(opacityHorizontal)
         meridianDisc.mesh.material.opacity = opacityHorizontal.surface;
         azimuthVector.mesh.material.opacity = opacityHorizontal.path;
         altitudeVector.mesh.material.opacity = opacityHorizontal.path;
+        house.traverse( function (child)
+        {
+            if ( child instanceof THREE.Mesh )
+            {
+                child.material.opacity = opacityHorizontal.path;
+            }
+        });
+        tree.traverse( function (child)
+        {
+            if ( child instanceof THREE.Mesh )
+            {
+                child.material.opacity = opacityHorizontal.path;
+            }
+        });
     })
 
 var tweenHorizontalFadeIn = new TWEEN.Tween(opacityHorizontal)
@@ -417,6 +455,38 @@ var tweenHorizontalFadeIn = new TWEEN.Tween(opacityHorizontal)
 
         azimuthVector.mesh.material.opacity = opacityHorizontal.path;
         altitudeVector.mesh.material.opacity = opacityHorizontal.path;
+        house.traverse( function (child)
+        {
+            if ( child instanceof THREE.Mesh )
+            {
+                child.material.opacity = opacityHorizontal.path;
+            }
+        });
+        tree.traverse( function (child)
+        {
+            if ( child instanceof THREE.Mesh )
+            {
+                child.material.opacity = opacityHorizontal.path;
+            }
+        });
+    })
+    .onComplete(function() {
+        house.traverse( function (child)
+        {
+            if ( child instanceof THREE.Mesh )
+            {
+                child.material.transparent = false;
+                child.material.depthWrite = true;
+            }
+        });
+        tree.traverse( function (child)
+        {
+            if ( child instanceof THREE.Mesh )
+            {
+                child.material.transparent = false;
+                child.material.depthWrite = true;
+            }
+        });   
     })
 
 var opacityInfoBoxHorizontal = { value: 0.0 };
