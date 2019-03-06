@@ -8,8 +8,7 @@ declination = 20 * DEG_TO_RAD; /* declination of the star */
 // Useful values. Do not touch.
 angle_to_north_pole = ( 90.0 - latitude ) * DEG_TO_RAD; /* angle between current latitude and north pole. */
 
-
-// Declare scenbe.
+// Declare scene.
 var scene = new THREE.Scene();
 
 // Comnfigure camera.
@@ -70,7 +69,7 @@ zenith = new Dot3D(new THREE.Vector3(0.0, 1.0, 0.0), 0.05, 0x666666 );
 nadir = new Dot3D(new THREE.Vector3(0.0, -1.0, 0.0), 0.05, 0x666666 );
 
 // Labels.
-titleLabel = new FlatText(new THREE.Vector3(0.0, 2.0, 0.0), new THREE.Vector3(0.0, 0.0, -1.0), 0.0, 0.2, "The Horizontal System", 0xaaaaaa);
+titleLabel = new FlatText(new THREE.Vector3(0.0, 2.0, 0.0), new THREE.Vector3(0.0, 0.0, -1.0), 0.0, 0.2, "Celestial Coordinate Systems", 0xaaaaaa);
 SLabel = new FlatText(new THREE.Vector3(0.0, 0.0, 1.3), new THREE.Vector3(0.0, 1.0, 0.0), Math.PI, 0.1, "S", 0x666666);
 NLabel = new FlatText(new THREE.Vector3(0.0, 0.0, -1.3), new THREE.Vector3(0.0, 1.0, 0.0), 0.0, 0.1, "N", 0x666666);
 WLabel = new FlatText(new THREE.Vector3(-1.3, 0.0, 0.0), new THREE.Vector3(0.0, 1.0, 0.0), Math.PI/2, 0.1, "W", 0x666666);
@@ -90,8 +89,10 @@ orbit = new Circle3D(radius, midpoint, new THREE.Vector3(0.0, 1.0, 0.0));
 // Vectors in equatorial system.
 declinationVector = new Arc3D(1, 0.0, declination, new THREE.Vector3(0.0, 0.0, 0.0), new THREE.Vector3(-1.0, 0.0, 0.0));
 declinationVector.setStyle(lineStyleArrow2);
-rightAscensionVector = new Arc3D(1, 0.0, 1.0, new THREE.Vector3(0.0, 0.0, 0.0), new THREE.Vector3(0.0, 1.0, 0.0));
-rightAscensionVector.setStyle(lineStyleArrow2);
+
+// Vectors in horizon System.
+azimuthVector = new Arc3D(1, 0.0, 1.0, new THREE.Vector3(0.0, 0.0, 0.0), new THREE.Vector3(0.0, 1.0, 0.0));
+altitudeVector = new Arc3D(1, 0.0, 1.0, new THREE.Vector3(0.0, 0.0, 0.0), new THREE.Vector3(1.0, 0.0, 0.0));
 
 // Set styles.
 horizon.setStyle(lineStyle1);
@@ -102,9 +103,14 @@ WE.setStyle(lineStyleLight);
 orbit.setStyle(lineStyleOrbit);
 equator.setStyle(lineStyle4);
 pole.setStyle(lineStyleArrow2);
+azimuthVector.setStyle(lineStyleArrow)
+altitudeVector.setStyle(lineStyleArrow)
+rightAscensionVector = new Arc3D(1, 0.0, 1.0, new THREE.Vector3(0.0, 0.0, 0.0), new THREE.Vector3(0.0, 1.0, 0.0));
+rightAscensionVector.setStyle(lineStyleArrow2);
 
 // Horizon System
 var horizonSystem = new THREE.Group();
+horizonSystem.name = "Horizon System";
 horizonSystem.add(horizon.getMesh());
 horizonSystem.add(meridian.getMesh());
 horizonSystem.add(ZN.getMesh());
@@ -124,9 +130,12 @@ horizonSystem.add(WLabel.getMesh());
 horizonSystem.add(ELabel.getMesh());
 horizonSystem.add(zenithLabel.getMesh());
 horizonSystem.add(nadirLabel.getMesh());
+horizonSystem.add(azimuthVector.getMesh());
+horizonSystem.add(altitudeVector.getMesh());
 
 // Equatorial System
 var equatorialSystem = new THREE.Group();
+equatorialSystem.name = "Equatorial System";
 equatorialSystem.add(equator.getMesh());
 equatorialSystem.add(equatorDisc.getMesh());
 equatorialSystem.add(pole.getMesh());
@@ -137,6 +146,7 @@ equatorialSystem.rotation.x = -angle_to_north_pole;
 
 // Star
 var starSystem = new THREE.Group();
+starSystem.name = "Star System";
 starSystem.add(star.getMesh());
 starSystem.add(orbit.getMesh());
 starSystem.rotation.x = -angle_to_north_pole;
@@ -148,19 +158,7 @@ scene.add(starSystem);
 scene.add(equatorialSystem);
 scene.add(horizonSystem);
 
-// TODO: tydiing up everything below here
-
-arc = new Arc3D(1, 0.0, 1.0, new THREE.Vector3(0.0, 0.0, 0.0), new THREE.Vector3(0.0, 1.0, 0.0));
-arc2 = new Arc3D(1, 0.0, 1.0, new THREE.Vector3(0.0, 0.0, 0.0), new THREE.Vector3(1.0, 0.0, 0.0));
-arc.setStyle(lineStyleArrow)
-arc2.setStyle(lineStyleArrow)
-//arc_surface = new ArcSurface3D(1, 0.0, 1.0, new THREE.Vector3(0.0, 0.0, 0.0), new THREE.Vector3(0.0, 0.0, 0.0), 0xff6361);
-
-
-scene.add(arc.mesh)
-scene.add(arc2.mesh)
-//scene.add(arc_surface.mesh)
-
+// Models.
 var loader = new THREE.GLTFLoader();
 
 loader.load( 'models/observer.glb', function ( gltf ) {
@@ -172,7 +170,7 @@ loader.load( 'models/observer.glb', function ( gltf ) {
             child.material = material;
         }
     });
-    scene.add(gltf.scene);
+    horizonSystem.add(gltf.scene);
 
 }, undefined, function ( error ) {
 	console.error( error );
@@ -190,7 +188,7 @@ loader.load( 'models/house.glb', function ( gltf ) {
     gltf.scene.scale.set(3, 3, 3);
     gltf.scene.position.x = -0.3;
     gltf.scene.position.z = 0.3;
-    scene.add(gltf.scene);
+    horizonSystem.add(gltf.scene);
 
 }, undefined, function ( error ) {
 
@@ -209,29 +207,19 @@ loader.load( 'models/tree.glb', function ( gltf ) {
     gltf.scene.scale.set(3, 3, 3);
     gltf.scene.position.x = -0.4;
     gltf.scene.position.z = 0.4;
-    scene.add(gltf.scene);
+    horizonSystem.add(gltf.scene);
 
 }, undefined, function ( error ) {
 
 	console.error( error );
 } );
 
-/*
-var mixer;
-var scaleKF = new THREE.VectorKeyframeTrack( '.material.opacity', [ 0, 1 ], [ 1, 0 ] );
-
-var clip = new THREE.AnimationClip( 'Action', 3, [ scaleKF ] );
-// setup the AnimationMixer
-mixer = new THREE.AnimationMixer( arc.mesh );
-// create a ClipAction and set it to play
-var clipAction = mixer.clipAction( clip );
-clipAction.play();
-*/
-
 var rightAscension = 0.0;
 
-var animate = function () {
+function animate(time ) {
     requestAnimationFrame( animate );
+
+    TWEEN.update( time );
 
     controls.update();
     
@@ -259,8 +247,8 @@ var animate = function () {
 
     var normalvec = new THREE.Vector3(-Math.cos(starpos_kk.theta), 0.0, Math.sin(starpos_kk.theta));
 
-    arc.update(1, -Math.PI/2, - starpos_kk.phi, new THREE.Vector3(0.0, 0.0, 0.0), normalvec);
-    arc2.update(1, Math.PI, Math.PI + starpos_kk.theta, new THREE.Vector3(0.0, 0.0, 0.0), new THREE.Vector3(0.0, 1.0, 0.0));
+    azimuthVector.update(1, -Math.PI/2, - starpos_kk.phi, new THREE.Vector3(0.0, 0.0, 0.0), normalvec);
+    altitudeVector.update(1, Math.PI, Math.PI + starpos_kk.theta, new THREE.Vector3(0.0, 0.0, 0.0), new THREE.Vector3(0.0, 1.0, 0.0));
     //arc_surface.updateMesh(1, 0.0, Math.PI/2 - starpos_kk.phi, new THREE.Vector3(0.0, 0.0, 0.0), normalvec, 0xff6361); // do we really need this?
 
     rightAscensionVector.update(1, -Math.PI/2, -Math.PI/2-rightAscension, new THREE.Vector3(0.0, 0.0, 0.0), new THREE.Vector3(0.0, 1.0, 0.0));
@@ -269,3 +257,140 @@ var animate = function () {
 };
 
 animate();
+
+// animations
+var opacityEquatorial = { path:1, surface:0.15 }; // start at 1.0
+var tweenEquatorialFadeOut = new TWEEN.Tween(opacityEquatorial)
+    .to({ path:0.05, surface:0.0 }, 500)  // change in 0.5 seconds
+    .easing(TWEEN.Easing.Quadratic.Out)
+    .onUpdate(function() {
+        equator.mesh.material.opacity = opacityEquatorial.path;
+        equatorDisc.mesh.material.opacity = opacityEquatorial.surface;
+        pole.mesh.material.opacity = opacityEquatorial.path;
+        poleLabel.mesh.material.opacity = opacityEquatorial.path;
+        rightAscensionVector.mesh.material.opacity = opacityEquatorial.path;
+        declinationVector.mesh.material.opacity = opacityEquatorial.path;
+    })
+
+var tweenEquatorialFadeIn = new TWEEN.Tween(opacityEquatorial)
+    .to({ path:1.0, surface:0.15 }, 500)  // change in 0.5 seconds
+    .easing(TWEEN.Easing.Quadratic.In)
+    .onUpdate(function() {
+        equator.mesh.material.opacity = opacityEquatorial.path;
+        equatorDisc.mesh.material.opacity = opacityEquatorial.surface;
+        pole.mesh.material.opacity = opacityEquatorial.path;
+        poleLabel.mesh.material.opacity = opacityEquatorial.path;
+        rightAscensionVector.mesh.material.opacity = opacityEquatorial.path;
+        declinationVector.mesh.material.opacity = opacityEquatorial.path;
+    })
+
+var opacityHorizontal = { path:1, surface:0.15 }; // start at 1.0
+var tweenHorizontalFadeOut = new TWEEN.Tween(opacityHorizontal)
+    .to({ path:0.05, surface:0.0 }, 500)  // change in 0.5 seconds
+    .easing(TWEEN.Easing.Quadratic.Out)
+    .onUpdate(function() {
+        horizon.mesh.material.opacity = opacityHorizontal.path;
+        meridian.mesh.material.opacity = opacityHorizontal.path;
+        ZN.mesh.material.opacity = opacityHorizontal.path;
+        NS.mesh.material.opacity = opacityHorizontal.path;
+        WE.mesh.material.opacity = opacityHorizontal.path;
+        S.mesh.material.opacity = opacityHorizontal.path;
+        N.mesh.material.opacity = opacityHorizontal.path;
+        W.mesh.material.opacity = opacityHorizontal.path;
+        E.mesh.material.opacity = opacityHorizontal.path;
+        zenith.mesh.material.opacity = opacityHorizontal.path;
+        nadir.mesh.material.opacity = opacityHorizontal.path;
+        SLabel.mesh.material.opacity = opacityHorizontal.path;
+        NLabel.mesh.material.opacity = opacityHorizontal.path;
+        WLabel.mesh.material.opacity = opacityHorizontal.path;
+        zenithLabel.mesh.material.opacity = opacityHorizontal.path;
+        nadirLabel.mesh.material.opacity = opacityHorizontal.path;
+        horizonDisc.mesh.material.opacity = opacityHorizontal.surface;
+        meridianDisc.mesh.material.opacity = opacityHorizontal.surface;
+        azimuthVector.mesh.material.opacity = opacityHorizontal.path;
+        altitudeVector.mesh.material.opacity = opacityHorizontal.path;
+    })
+
+var tweenHorizontalFadeIn = new TWEEN.Tween(opacityHorizontal)
+    .to({ path:1.0, surface:0.15 }, 500)  // change in 0.5 seconds
+    .easing(TWEEN.Easing.Quadratic.In)
+    .onUpdate(function() {
+        horizon.mesh.material.opacity = opacityHorizontal.path;
+        meridian.mesh.material.opacity = opacityHorizontal.path;
+        ZN.mesh.material.opacity = opacityHorizontal.path;
+        NS.mesh.material.opacity = opacityHorizontal.path;
+        WE.mesh.material.opacity = opacityHorizontal.path;
+        S.mesh.material.opacity = opacityHorizontal.path;
+        N.mesh.material.opacity = opacityHorizontal.path;
+        W.mesh.material.opacity = opacityHorizontal.path;
+        E.mesh.material.opacity = opacityHorizontal.path;
+        zenith.mesh.material.opacity = opacityHorizontal.path;
+        nadir.mesh.material.opacity = opacityHorizontal.path;
+        SLabel.mesh.material.opacity = opacityHorizontal.path;
+        NLabel.mesh.material.opacity = opacityHorizontal.path;
+        WLabel.mesh.material.opacity = opacityHorizontal.path;
+        zenithLabel.mesh.material.opacity = opacityHorizontal.path;
+        nadirLabel.mesh.material.opacity = opacityHorizontal.path;
+        horizonDisc.mesh.material.opacity = opacityHorizontal.surface;
+        meridianDisc.mesh.material.opacity = opacityHorizontal.surface;
+
+        azimuthVector.mesh.material.opacity = opacityHorizontal.path;
+        altitudeVector.mesh.material.opacity = opacityHorizontal.path;
+    })
+
+// Setup raycasting (taken directly from the three.js documentation).
+var raycaster = new THREE.Raycaster();
+var mouse_down = new THREE.Vector2();
+var mouse = new THREE.Vector2();
+
+function onMouseDown( event ) {
+
+	// calculate mouse position in normalized device coordinates
+	// (-1 to +1) for both components
+
+	mouse_down.x = ( event.clientX / window.innerWidth ) * 2 - 1;
+    mouse_down.y = - ( event.clientY / window.innerHeight ) * 2 + 1;
+
+}
+
+function onMouseUp( event ) {
+
+	// calculate mouse position in normalized device coordinates
+	// (-1 to +1) for both components
+
+	mouse.x = ( event.clientX / window.innerWidth ) * 2 - 1;
+    mouse.y = - ( event.clientY / window.innerHeight ) * 2 + 1;
+
+    if (mouse.x != mouse_down.x ||mouse.y != mouse_down.y)  // make sure the user didn't just pan
+    {
+        return;
+    }
+    
+    // Raycasting.
+
+    raycaster.setFromCamera( mouse, camera );
+
+    // calculate objects intersecting the picking ray
+    var intersects = raycaster.intersectObjects( scene.children, true );
+
+    if (intersects.length)
+    {
+        switch ( intersects[0].object.parent ) {
+            case horizonSystem:
+                tweenEquatorialFadeOut.start();
+                tweenHorizontalFadeIn.start();
+                break;
+            case equatorialSystem:
+                tweenHorizontalFadeOut.start();
+                tweenEquatorialFadeIn.start();
+                break;
+        }
+    }
+    else    // fade everything back ing
+    {
+        tweenEquatorialFadeIn.start();
+        tweenHorizontalFadeIn.start();
+    }
+}
+addEventListener( 'mousedown', onMouseDown, false );
+addEventListener( 'mouseup', onMouseUp, false );

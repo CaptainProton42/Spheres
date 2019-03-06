@@ -19,7 +19,7 @@ class Star extends Shape3D {
         loader.load( 'models/star.glb', function ( gltf ) {
 
             var geometry =  gltf.scene.children[0].geometry;
-            var material = new THREE.MeshBasicMaterial( { color: color } );
+            var material = new THREE.MeshBasicMaterial( { color: color, transparent: true, side: THREE.DoubleSide, depthWrite: false } );
 
             parent.mesh.geometry = geometry;
             parent.mesh.material = material;
@@ -39,7 +39,7 @@ class Dot3D extends Shape3D {
     constructor(position, size, color) {
         super();
         var geometry = new THREE.SphereGeometry( size, 32, 32 );
-        var material = new THREE.MeshBasicMaterial( { color: color } );
+        var material = new THREE.MeshBasicMaterial( { color: color, transparent: true, side: THREE.DoubleSide, depthWrite: false } );
 
         var mesh = new THREE.Mesh( geometry, material );
 
@@ -56,7 +56,7 @@ class DirectionMarker extends Shape3D {
         super();
         this.orientation = orientation;
 
-        var material = new THREE.MeshBasicMaterial( {color: color , side: THREE.DoubleSide } );
+        var material = new THREE.MeshBasicMaterial( {color: color, transparent: true, side: THREE.DoubleSide, depthWrite: false } );
 
         var shape = new THREE.Shape();
         shape.moveTo(-size, 0.0);
@@ -92,7 +92,7 @@ class FlatDot extends Shape3D {
         super();
         this.orientation = orientation;
 
-        var material = new THREE.MeshBasicMaterial( {color: color , side: THREE.DoubleSide } );
+        var material = new THREE.MeshBasicMaterial( {color: color, transparent: true, side: THREE.DoubleSide, depthWrite: false } );
 
         var shape = new THREE.Shape();
         shape.arc(0.0, 0.0, size, 0.0, 2*Math.PI, false);
@@ -140,7 +140,7 @@ class FlatText extends Shape3D {
             } );
             geometry.center();
 
-            var material = new THREE.MeshBasicMaterial( {color: color , side: THREE.DoubleSide } );
+            var material = new THREE.MeshBasicMaterial( {color: color, transparent: true, side: THREE.DoubleSide, depthWrite: false } );
     
             var n1 = new THREE.Vector3(0.0, 0.0, 1.0);
         

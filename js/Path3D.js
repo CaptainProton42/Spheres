@@ -24,7 +24,10 @@ class Path3D {
 
     updateMaterial() {
         var material = new THREE.MeshBasicMaterial( {
-            color: this.linestyle.color
+            color: this.linestyle.color,
+            transparent: true,
+            side: THREE.DoubleSide,
+            depthWrite: false
         });
         this.mesh.material = material;
     }
