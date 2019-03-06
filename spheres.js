@@ -238,6 +238,7 @@ function animate(time ) {
 
     var starpos = new THREE.Vector3();
     starSystem.children[0].getWorldPosition(starpos);
+    starpos.applyAxisAngle( new THREE.Vector3(1.0, 0.0, 0.0), -scene.rotation.x);
     var starpos_kk = new THREE.Spherical(0.0, 0.0, 0.0);
     starpos_kk.setFromCartesianCoords(starpos.x,starpos.y, starpos.z);
     if (starpos_kk.theta > 0.0)
