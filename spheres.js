@@ -258,6 +258,84 @@ function animate(time ) {
 
 animate();
 
+// Information box.
+
+var infoBoxHorizontal = document.createElement('div')
+infoBoxHorizontal.style.top = "10%";
+infoBoxHorizontal.style.left = "70%";
+infoBoxHorizontal.style.width = 500;
+infoBoxHorizontal.style.height = 8000;
+infoBoxHorizontal.style.opacity = 0.0;
+infoBoxHorizontal.style.webkitUserSelect = "none";
+infoBoxHorizontal.style.msUserSelect = "none";
+infoBoxHorizontal.style.mozUserSelect = "none";
+document.body.append(infoBoxHorizontal);
+
+var infoTitleHorizontal = document.createElement('div');
+infoTitleHorizontal.style.fontFamily = "Helvetica";
+infoTitleHorizontal.style.fontSize = "40px";
+infoTitleHorizontal.style.color = "#666666";
+infoTitleHorizontal.style.position = 'absolute';
+infoTitleHorizontal.style.width = 500;
+infoTitleHorizontal.style.height = 50;
+infoTitleHorizontal.innerHTML = "The Horizontal System";
+infoTitleHorizontal.style.top = 10 + '%';
+infoTitleHorizontal.style.left = 70 + '%';
+infoBoxHorizontal.appendChild(infoTitleHorizontal);
+
+var infoHorizontal = document.createElement('div');
+infoHorizontal.style.fontFamily = "Helvetica";
+infoHorizontal.style.fontSize = "20px";
+infoHorizontal.style.color = "#666666";
+infoHorizontal.style.position = 'absolute';
+infoHorizontal.style.width = 500;
+infoHorizontal.style.height = 800;
+infoHorizontal.innerHTML = "Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua.\
+                 At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet.\
+                 Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua.\
+                 At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet.";
+infoHorizontal.style.top = 20 + '%';
+infoHorizontal.style.left = 70 + '%';
+infoBoxHorizontal.appendChild(infoHorizontal);
+
+var infoBoxEquatorial = document.createElement('div')
+infoBoxEquatorial.style.top = "10%";
+infoBoxEquatorial.style.left = "70%";
+infoBoxEquatorial.style.width = 500;
+infoBoxEquatorial.style.height = 8000;
+infoBoxEquatorial.style.opacity = 0.0;
+infoBoxEquatorial.style.webkitUserSelect = "none";
+infoBoxEquatorial.style.msUserSelect = "none";
+infoBoxEquatorial.style.mozUserSelect = "none";
+document.body.append(infoBoxEquatorial);
+
+var infoTitleEquatorial = document.createElement('div');
+infoTitleEquatorial.style.fontFamily = "Helvetica";
+infoTitleEquatorial.style.fontSize = "40px";
+infoTitleEquatorial.style.color = "#666666";
+infoTitleEquatorial.style.position = 'absolute';
+infoTitleEquatorial.style.width = 500;
+infoTitleEquatorial.style.height = 50;
+infoTitleEquatorial.innerHTML = "The Equatorial System";
+infoTitleEquatorial.style.top = 10 + '%';
+infoTitleEquatorial.style.left = 70 + '%';
+infoBoxEquatorial.appendChild(infoTitleEquatorial);
+
+var infoEquatorial = document.createElement('div');
+infoEquatorial.style.fontFamily = "Helvetica";
+infoEquatorial.style.fontSize = "20px";
+infoEquatorial.style.color = "#666666";
+infoEquatorial.style.position = 'absolute';
+infoEquatorial.style.width = 500;
+infoEquatorial.style.height = 800;
+infoEquatorial.innerHTML = "Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua.\
+                 At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet.\
+                 Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua.\
+                 At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet.";
+infoEquatorial.style.top = 20 + '%';
+infoEquatorial.style.left = 70 + '%';
+infoBoxEquatorial.appendChild(infoEquatorial);
+
 // animations
 var opacityEquatorial = { path:1, surface:0.15 }; // start at 1.0
 var tweenEquatorialFadeOut = new TWEEN.Tween(opacityEquatorial)
@@ -340,6 +418,48 @@ var tweenHorizontalFadeIn = new TWEEN.Tween(opacityHorizontal)
         altitudeVector.mesh.material.opacity = opacityHorizontal.path;
     })
 
+var opacityInfoBoxHorizontal = { value: 0.0 };
+var tweenInfoBoxHorizontalFadeOut = new TWEEN.Tween(opacityInfoBoxHorizontal)
+    .to( { value: 0.0 }, 500 )
+    .easing(TWEEN.Easing.Quadratic.Out)
+    .onUpdate(function() {
+        infoBoxHorizontal.style.opacity = opacityInfoBoxHorizontal.value;
+    })
+var tweenInfoBoxHorizontalFadeIn = new TWEEN.Tween(opacityInfoBoxHorizontal)
+    .to( { value: 1.0 }, 500 )
+    .easing(TWEEN.Easing.Quadratic.In)
+    .onUpdate(function() {
+        infoBoxHorizontal.style.opacity = opacityInfoBoxHorizontal.value;
+    })
+
+var opacityInfoBoxEquatorial = { value: 0.0 };
+var tweenInfoBoxEquatorialFadeOut = new TWEEN.Tween(opacityInfoBoxEquatorial)
+    .to( { value: 0.0 }, 500 )
+    .easing(TWEEN.Easing.Quadratic.Out)
+    .onUpdate(function() {
+        infoBoxEquatorial.style.opacity = opacityInfoBoxEquatorial.value;
+    })
+var tweenInfoBoxEquatorialFadeIn = new TWEEN.Tween(opacityInfoBoxEquatorial)
+    .to( { value: 1.0 }, 500 )
+    .easing(TWEEN.Easing.Quadratic.In)
+    .onUpdate(function() {
+        infoBoxEquatorial.style.opacity = opacityInfoBoxEquatorial.value;
+    })
+
+var worldRotation = { value: 0.0 };
+var tweenRotateToEquator = new TWEEN.Tween(worldRotation)
+    .to( { value: angle_to_north_pole }, 500)
+    .easing(TWEEN.Easing.Quadratic.Out)
+    .onUpdate(function() {
+        scene.rotation.x = worldRotation.value;
+    })
+var tweenRotateToHorizon = new TWEEN.Tween(worldRotation)
+    .to( { value: 0.0 }, 500)
+    .easing(TWEEN.Easing.Quadratic.Out)
+    .onUpdate(function() {
+        scene.rotation.x = worldRotation.value;
+    })
+
 // Setup raycasting (taken directly from the three.js documentation).
 var raycaster = new THREE.Raycaster();
 var mouse_down = new THREE.Vector2();
@@ -381,17 +501,26 @@ function onMouseUp( event ) {
             case horizonSystem:
                 tweenEquatorialFadeOut.start();
                 tweenHorizontalFadeIn.start();
+                tweenInfoBoxHorizontalFadeIn.start();
+                tweenInfoBoxEquatorialFadeOut.start();
+                tweenRotateToHorizon.start();
                 break;
             case equatorialSystem:
                 tweenHorizontalFadeOut.start();
                 tweenEquatorialFadeIn.start();
+                tweenInfoBoxEquatorialFadeIn.start();
+                tweenInfoBoxHorizontalFadeOut.start();
+                tweenRotateToEquator.start();
                 break;
         }
     }
-    else    // fade everything back ing
+    else    // fade everything back in
     {
         tweenEquatorialFadeIn.start();
         tweenHorizontalFadeIn.start();
+        tweenInfoBoxHorizontalFadeOut.start();
+        tweenInfoBoxEquatorialFadeOut.start();
+        tweenRotateToHorizon.start();
     }
 }
 addEventListener( 'mousedown', onMouseDown, false );

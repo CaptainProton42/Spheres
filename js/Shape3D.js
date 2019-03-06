@@ -130,6 +130,7 @@ class FlatText extends Shape3D {
         var parent = this;
 
         loader.load( 'https://raw.githubusercontent.com/mrdoob/three.js/dev/examples/fonts/helvetiker_regular.typeface.json', function ( font ) {
+        //loader.load( 'fonts/Roboto_Regular.json', function ( font ) {
         
             var geometry = new THREE.TextGeometry( text, {
                 font: font,
