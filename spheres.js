@@ -2,7 +2,7 @@
 DEG_TO_RAD = 2 * Math.PI / 360;
 
 // Simulation parameters.
-latitude = -50; /* latitude of observer in degrees */
+latitude = 50; /* latitude of observer in degrees */
 declination = 20 * DEG_TO_RAD; /* declination of the star */
 
 // Useful values. Do not touch.
