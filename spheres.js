@@ -2,7 +2,7 @@
 DEG_TO_RAD = 2 * Math.PI / 360;
 
 // Simulation parameters.
-latitude = 50; /* latitude of observer in degrees */
+latitude = -50; /* latitude of observer in degrees */
 declination = 20 * DEG_TO_RAD; /* declination of the star */
 
 // Useful values. Do not touch.
@@ -75,7 +75,7 @@ WLabel = new FlatText(new THREE.Vector3(-1.3, 0.0, 0.0), new THREE.Vector3(0.0, 
 ELabel = new FlatText(new THREE.Vector3(1.3, 0.0, 0.0), new THREE.Vector3(0.0, 1.0, 0.0), -Math.PI/2, 0.1, "E", 0x666666);
 zenithLabel = new FlatText(new THREE.Vector3(0.0, 1.2, 0.0), new THREE.Vector3(0.0, 0.0, -1.0), 0.0, 0.1, "Zenith", 0x666666);
 nadirLabel = new FlatText(new THREE.Vector3(0.0, -1.2, 0.0), new THREE.Vector3(0.0, 0.0, -1.0), 0.0, 0.1, "Nadir", 0x666666);
-poleLabel = new FlatText(new THREE.Vector3(0.0, 1.6, 0.0), new THREE.Vector3(0.0, 0.0, -1.0), 0.0, 0.1, "Pole", 0xbc5090);
+poleLabel = new FlatText(new THREE.Vector3(0.0, 1.6, 0.0), new THREE.Vector3(0.0, 0.0, -1.0), 0.0, 0.1, "Celestial North", 0xbc5090);
 
 
 // Star and its "orbit".
@@ -119,6 +119,9 @@ horizonSystem.add(zenithLabel.getMesh());
 horizonSystem.add(nadirLabel.getMesh());
 horizonSystem.add(azimuthVector.getMesh());
 horizonSystem.add(altitudeVector.getMesh());
+horizonSystem.add(N.getMesh());
+horizonSystem.add(SLabel.getMesh());
+horizonSystem.add(NLabel.getMesh());
 
 // Equatorial System
 var equatorialSystem = new THREE.Group();
@@ -141,18 +144,15 @@ starSystem.rotation.x = -angle_to_north_pole;
 // Reference points that should stay the same in both systems.
 var globalReference = new THREE.Group();
 globalReference.name = "Global Reference";
-globalReference.add(S.getMesh());
-globalReference.add(N.getMesh());
 globalReference.add(W.getMesh());
 globalReference.add(E.getMesh());
-globalReference.add(SLabel.getMesh());
-globalReference.add(NLabel.getMesh());
 globalReference.add(WLabel.getMesh());
 globalReference.add(ELabel.getMesh());
-globalReference.add(NS.getMesh());
 globalReference.add(WE.getMesh());
 globalReference.add(meridian.getMesh());
 globalReference.add(meridianDisc.getMesh());
+globalReference.add(S.getMesh());
+globalReference.add(NS.getMesh());
 
 
 // Add meshes to scene.
@@ -407,6 +407,9 @@ var tweenHorizontalFadeOut = new TWEEN.Tween(opacityHorizontal)
         horizonDisc.mesh.material.opacity = opacityHorizontal.surface;
         azimuthVector.mesh.material.opacity = opacityHorizontal.path;
         altitudeVector.mesh.material.opacity = opacityHorizontal.path;
+        SLabel.mesh.material.opacity = opacityHorizontal.path;
+        NLabel.mesh.material.opacity = opacityHorizontal.path;
+        N.mesh.material.opacity = opacityHorizontal.path;
         house.traverse( function (child)
         {
             if ( child instanceof THREE.Mesh )
@@ -434,6 +437,9 @@ var tweenHorizontalFadeIn = new TWEEN.Tween(opacityHorizontal)
         zenithLabel.mesh.material.opacity = opacityHorizontal.path;
         nadirLabel.mesh.material.opacity = opacityHorizontal.path;
         horizonDisc.mesh.material.opacity = opacityHorizontal.surface;
+        SLabel.mesh.material.opacity = opacityHorizontal.path;
+        NLabel.mesh.material.opacity = opacityHorizontal.path;
+        N.mesh.material.opacity = opacityHorizontal.path;
 
         azimuthVector.mesh.material.opacity = opacityHorizontal.path;
         altitudeVector.mesh.material.opacity = opacityHorizontal.path;
