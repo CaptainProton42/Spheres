@@ -2,11 +2,12 @@
 DEG_TO_RAD = 2 * Math.PI / 360;
 
 // Simulation parameters.
-latitude = 50; /* latitude of observer in degrees */
-declination = 20 * DEG_TO_RAD; /* declination of the star */
+var latitude = 50; /* latitude of observer in degrees */
+var declination = 20 * DEG_TO_RAD; /* declination of the star */
+var rightAscension = 50 * DEG_TO_RAD;   /* right ascension of the star */
 
 // Useful values. Do not touch.
-angle_to_north_pole = ( 90.0 - latitude ) * DEG_TO_RAD; /* angle between current latitude and north pole. */
+var angle_to_north_pole = ( 90.0 - latitude ) * DEG_TO_RAD; /* angle between current latitude and north pole. */
 
 // Declare scene.
 var scene = new THREE.Scene();
@@ -26,7 +27,7 @@ renderer.setPixelRatio( window.devicePixelRatio );
 document.body.appendChild( renderer.domElement );
 
 // Add controls. We want only rotation.
-controls = new THREE.OrbitControls( camera, renderer.domElement );
+var controls = new THREE.OrbitControls( camera, renderer.domElement );
 controls.enablePan = false;
 controls.enableZoom = false;
 controls.enableDamping = true;
@@ -67,6 +68,7 @@ W = new FlatDot(new THREE.Vector3(1.1, 0.0, 0.0), new THREE.Vector3(0.0, 1.0, 0.
 E = new FlatDot(new THREE.Vector3(-1.1, 0.0, 0.0), new THREE.Vector3(0.0, 1.0, 0.0), 0.05, 0x666666);
 zenith = new Dot3D(new THREE.Vector3(0.0, 1.0, 0.0), 0.05, 0x666666 );
 nadir = new Dot3D(new THREE.Vector3(0.0, -1.0, 0.0), 0.05, 0x666666 );
+equinox = new Dot3D(new THREE.Vector3(0.0, 0.0, 1.0), 0.05, 0x666666 );
 
 // Labels.
 SLabel = new FlatText(new THREE.Vector3(0.0, 0.0, 1.3), new THREE.Vector3(0.0, 1.0, 0.0), Math.PI, 0.1, "S", 0x666666);
@@ -87,11 +89,14 @@ orbit = new Circle3D(radius, midpoint, new THREE.Vector3(0.0, 1.0, 0.0));
 
 // Vectors in equatorial system.
 declinationVector = new Arc3D(1, 0.0, declination, new THREE.Vector3(0.0, 0.0, 0.0), new THREE.Vector3(-1.0, 0.0, 0.0));
-declinationVector.setStyle(lineStyleArrow2);
+hourAngleVector = new Arc3D(1, 0.0, 1.0, new THREE.Vector3(0.0, 0.0, 0.0), new THREE.Vector3(0.0, 1.0, 0.0));
 
 // Vectors in horizon System.
 azimuthVector = new Arc3D(1, 0.0, 1.0, new THREE.Vector3(0.0, 0.0, 0.0), new THREE.Vector3(0.0, 1.0, 0.0));
 altitudeVector = new Arc3D(1, 0.0, 1.0, new THREE.Vector3(0.0, 0.0, 0.0), new THREE.Vector3(1.0, 0.0, 0.0));
+
+// Vectors in the rotating equatorial system.
+rightAscensionVector = new Arc3D(1, -Math.PI/2, -Math.PI/2-rightAscension, new THREE.Vector3(0.0, 0.0, 0.0), new THREE.Vector3(0.0, 1.0, 0.0));
 
 // Set styles.
 horizon.setStyle(lineStyle1);
@@ -104,7 +109,8 @@ equator.setStyle(lineStyle4);
 pole.setStyle(lineStyleArrow2);
 azimuthVector.setStyle(lineStyleArrow)
 altitudeVector.setStyle(lineStyleArrow)
-rightAscensionVector = new Arc3D(1, 0.0, 1.0, new THREE.Vector3(0.0, 0.0, 0.0), new THREE.Vector3(0.0, 1.0, 0.0));
+hourAngleVector.setStyle(lineStyleArrow);
+declinationVector.setStyle(lineStyleArrow2);
 rightAscensionVector.setStyle(lineStyleArrow2);
 
 // Horizon System
@@ -130,9 +136,17 @@ equatorialSystem.add(equator.getMesh());
 equatorialSystem.add(equatorDisc.getMesh());
 equatorialSystem.add(pole.getMesh());
 equatorialSystem.add(poleLabel.getMesh());
-equatorialSystem.add(rightAscensionVector.getMesh());
-equatorialSystem.add(declinationVector.getMesh());
+equatorialSystem.add(hourAngleVector.getMesh());
 equatorialSystem.rotation.x = -angle_to_north_pole;
+
+// Rotating equatorial System
+
+var rotEquatorialSystem = new THREE.Group();
+rotEquatorialSystem.name = "Rotating Equatorial System";
+rotEquatorialSystem.add(equinox.getMesh());
+rotEquatorialSystem.add(rightAscensionVector.getMesh());
+rotEquatorialSystem.add(declinationVector.getMesh());
+rotEquatorialSystem.rotation.x = -angle_to_north_pole;
 
 // Star
 var starSystem = new THREE.Group();
@@ -160,6 +174,7 @@ scene.add(starSystem);
 scene.add(equatorialSystem);
 scene.add(horizonSystem);
 scene.add(globalReference);
+scene.add(rotEquatorialSystem);
 
 // Models.
 
@@ -225,7 +240,8 @@ loader.load( 'models/tree.glb', function ( gltf ) {
 	console.error( error );
 } );
 
-var rightAscension = 0.0;
+var hourAngle = rightAscension;
+declinationVector.mesh.rotation.y -= hourAngle;
 
 function animate(time ) {
     requestAnimationFrame( animate );
@@ -238,14 +254,14 @@ function animate(time ) {
 
 
     var deltatheta = 0.01 * delta / 0.016;
-    rightAscension += deltatheta;
-    if ( rightAscension > 2*Math.PI )
+    hourAngle += deltatheta;
+    if ( hourAngle > 2*Math.PI )
     {
-        rightAscension -= 2*Math.PI;
+        hourAngle -= 2*Math.PI;
     }
 
-    starSystem.rotateY(-deltatheta);
-    declinationVector.getMesh().rotateY(-deltatheta);
+    starSystem.rotation.y = -hourAngle;
+    rotEquatorialSystem.rotateY(-deltatheta);
 
     var starpos = new THREE.Vector3();
     starSystem.children[0].getWorldPosition(starpos);
@@ -263,7 +279,14 @@ function animate(time ) {
     altitudeVector.update(1, Math.PI, Math.PI + starpos_kk.theta, new THREE.Vector3(0.0, 0.0, 0.0), new THREE.Vector3(0.0, 1.0, 0.0));
     //arc_surface.updateMesh(1, 0.0, Math.PI/2 - starpos_kk.phi, new THREE.Vector3(0.0, 0.0, 0.0), normalvec, 0xff6361); // do we really need this?
 
-    rightAscensionVector.update(1, -Math.PI/2, -Math.PI/2-rightAscension, new THREE.Vector3(0.0, 0.0, 0.0), new THREE.Vector3(0.0, 1.0, 0.0));
+    var equinoxAngle = hourAngle-rightAscension;
+    console.log(equinoxAngle);
+    if (equinoxAngle < 0.0 )
+    {
+        equinoxAngle += 2*Math.PI;
+    }
+
+    hourAngleVector.update(1, -Math.PI/2, -Math.PI/2-equinoxAngle, new THREE.Vector3(0.0, 0.0, 0.0), new THREE.Vector3(0.0, 1.0, 0.0));
 
     renderer.render( scene, camera );
 };
@@ -359,7 +382,7 @@ var tweenEquatorialFadeOut = new TWEEN.Tween(opacityEquatorial)
         equatorDisc.mesh.material.opacity = opacityEquatorial.surface;
         pole.mesh.material.opacity = opacityEquatorial.path;
         poleLabel.mesh.material.opacity = opacityEquatorial.path;
-        rightAscensionVector.mesh.material.opacity = opacityEquatorial.path;
+        hourAngleVector.mesh.material.opacity = opacityEquatorial.path;
         declinationVector.mesh.material.opacity = opacityEquatorial.path;
     })
 
@@ -371,7 +394,7 @@ var tweenEquatorialFadeIn = new TWEEN.Tween(opacityEquatorial)
         equatorDisc.mesh.material.opacity = opacityEquatorial.surface;
         pole.mesh.material.opacity = opacityEquatorial.path;
         poleLabel.mesh.material.opacity = opacityEquatorial.path;
-        rightAscensionVector.mesh.material.opacity = opacityEquatorial.path;
+        hourAngleVector.mesh.material.opacity = opacityEquatorial.path;
         declinationVector.mesh.material.opacity = opacityEquatorial.path;
     })
 
