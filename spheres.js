@@ -131,15 +131,15 @@ horizonSystem.add(N.getMesh());
 horizonSystem.add(SLabel.getMesh());
 horizonSystem.add(NLabel.getMesh());
 
-// Equatorial System
-var equatorialSystem = new THREE.Group();
-equatorialSystem.name = "Equatorial System";
-equatorialSystem.add(equator.getMesh());
-equatorialSystem.add(equatorDisc.getMesh());
-equatorialSystem.add(pole.getMesh());
-equatorialSystem.add(poleLabel.getMesh());
-equatorialSystem.add(hourAngleVector.getMesh());
-equatorialSystem.rotation.x = -angle_to_north_pole;
+// Resting Equatorial System
+var restEquatorialSystem = new THREE.Group();
+restEquatorialSystem.name = "Resting Equatorial System";
+restEquatorialSystem.add(equator.getMesh());
+restEquatorialSystem.add(equatorDisc.getMesh());
+restEquatorialSystem.add(pole.getMesh());
+restEquatorialSystem.add(poleLabel.getMesh());
+restEquatorialSystem.add(hourAngleVector.getMesh());
+restEquatorialSystem.rotation.x = -angle_to_north_pole;
 
 // Rotating equatorial System
 
@@ -147,9 +147,14 @@ var rotEquatorialSystem = new THREE.Group();
 rotEquatorialSystem.name = "Rotating Equatorial System";
 rotEquatorialSystem.add(equinox.getMesh());
 rotEquatorialSystem.add(rightAscensionVector.getMesh());
-rotEquatorialSystem.add(declinationVector.getMesh());
 rotEquatorialSystem.add(equinoxHourAngleVector.getMesh());
 rotEquatorialSystem.rotation.x = -angle_to_north_pole;
+
+// General equatorial system
+var equatorialSystem = new THREE.Group();
+equatorialSystem.name = "Equatorial System";
+equatorialSystem.add(declinationVector.getMesh());
+equatorialSystem.rotation.x = -angle_to_north_pole;
 
 // Star
 var starSystem = new THREE.Group();
@@ -177,10 +182,11 @@ cosmos = new THREE.Group();
 
 // Add meshes to scene.
 cosmos.add(starSystem);
-cosmos.add(equatorialSystem);
+cosmos.add(restEquatorialSystem);
 cosmos.add(horizonSystem);
 cosmos.add(globalReference);
 cosmos.add(rotEquatorialSystem);
+cosmos.add(equatorialSystem);
 
 scene.add(cosmos);
 
@@ -248,7 +254,16 @@ loader.load( 'models/tree.glb', function ( gltf ) {
 	console.error( error );
 } );
 
+rotEquatorialSystem.traverse( function (child)
+{
+    if ( child instanceof THREE.Mesh )
+    {
+        child.material.opacity = 0.0;
+    }
+});
+
 var isRotating = false;
+var rotEasing = 0.0;
 var hourAngle = rightAscension;
 declinationVector.mesh.rotation.y -= hourAngle;
 
@@ -266,7 +281,7 @@ function animate(time ) {
 
     if (isRotating)
     {
-        scene.rotation.y += deltatheta;
+        scene.rotation.y += rotEasing * deltatheta;
     }
 
     hourAngle += deltatheta;
@@ -277,6 +292,7 @@ function animate(time ) {
 
     starSystem.rotation.y = -hourAngle;
     rotEquatorialSystem.rotateY(-deltatheta);
+    equatorialSystem.rotateY(-deltatheta);
 
     var eqCoords = new RestingEquatorialCoordinates(hourAngle, declination);
     var horCoords = new HorizontalCoordinates(0.0, 0.0);
@@ -285,7 +301,6 @@ function animate(time ) {
     altitudeVector.update(1, 0.0, horCoords.altitude, new THREE.Vector3(0.0, 0.0, 0.0), new THREE.Vector3(0.0, 0.0, 1.0));
     altitudeVector.mesh.rotation.y = Math.PI/2-horCoords.azimuth;
     azimuthVector.update(1, Math.PI, -horCoords.azimuth, new THREE.Vector3(0.0, 0.0, 0.0), new THREE.Vector3(0.0, 1.0, 0.0));
-    console.log(horCoords);
 
     var equinoxAngle = hourAngle-rightAscension;
     if (equinoxAngle < 0.0 )
@@ -380,6 +395,34 @@ infoEquatorial.style.top = 20 + '%';
 infoEquatorial.style.left = 70 + '%';
 infoBoxEquatorial.appendChild(infoEquatorial);
 
+var mouseOnButton;
+// Button for toggle between rotational and resting equatorial system.
+var toggleEquatorialButton = document.createElement('div'); // semantically suboptimal, but no borders or highlightings
+toggleEquatorialButton.style.fontFamily = "Helvetica";
+toggleEquatorialButton.style.fontSize = "20px";
+toggleEquatorialButton.style.color = "#666666";
+toggleEquatorialButton.style.position = 'absolute';
+toggleEquatorialButton.style.top = '80%';
+toggleEquatorialButton.style.left = '70%';
+toggleEquatorialButton.innerHTML = '> Rotating Equatorial System';
+toggleEquatorialButton.onmouseenter = function () {
+    mouseOnButton = true;
+}
+toggleEquatorialButton.onmouseout = function() {
+    mouseOnButton = false;
+}
+infoBoxEquatorial.appendChild(toggleEquatorialButton);
+
+function onEquatorialButtonClicked() {
+    if ( !isRotating ) {
+        tweenRotEquatorialFadeIn.start();
+        toggleEquatorialButton.innerHTML = '> Resting Equatorial System';
+    } else {
+        tweenRotEquatorialFadeOut.start();
+        toggleEquatorialButton.innerHTML = '> Rotating Equatorial System';
+    }
+};
+
 // animations
 var opacityEquatorial = { path:1, surface:0.15 }; // start at 1.0
 var tweenEquatorialFadeOut = new TWEEN.Tween(opacityEquatorial)
@@ -390,8 +433,13 @@ var tweenEquatorialFadeOut = new TWEEN.Tween(opacityEquatorial)
         equatorDisc.mesh.material.opacity = opacityEquatorial.surface;
         pole.mesh.material.opacity = opacityEquatorial.path;
         poleLabel.mesh.material.opacity = opacityEquatorial.path;
-        equinoxHourAngleVector.mesh.material.opacity = opacityEquatorial.path;
+        hourAngleVector.mesh.material.opacity = opacityEquatorial.path;
         declinationVector.mesh.material.opacity = opacityEquatorial.path;
+        equinox.mesh.material.opacity = opacityEquatorial.path;
+        equinoxHourAngleVector.mesh.material.opacity = opacityEquatorial.path;
+    })
+    .onComplete( function () {
+
     })
 
 var tweenEquatorialFadeIn = new TWEEN.Tween(opacityEquatorial)
@@ -402,7 +450,7 @@ var tweenEquatorialFadeIn = new TWEEN.Tween(opacityEquatorial)
         equatorDisc.mesh.material.opacity = opacityEquatorial.surface;
         pole.mesh.material.opacity = opacityEquatorial.path;
         poleLabel.mesh.material.opacity = opacityEquatorial.path;
-        equinoxHourAngleVector.mesh.material.opacity = opacityEquatorial.path;
+        hourAngleVector.mesh.material.opacity = opacityEquatorial.path;
         declinationVector.mesh.material.opacity = opacityEquatorial.path;
     })
 
@@ -529,11 +577,18 @@ var tweenInfoBoxEquatorialFadeOut = new TWEEN.Tween(opacityInfoBoxEquatorial)
     .onUpdate(function() {
         infoBoxEquatorial.style.opacity = opacityInfoBoxEquatorial.value;
     })
+    .onComplete( function() {
+        toggleEquatorialButton.removeEventListener( "click", onEquatorialButtonClicked );
+    })
+
 var tweenInfoBoxEquatorialFadeIn = new TWEEN.Tween(opacityInfoBoxEquatorial)
     .to( { value: 1.0 }, 500 )
     .easing(TWEEN.Easing.Quadratic.In)
-    .onUpdate(function() {
+    .onUpdate( function() {
         infoBoxEquatorial.style.opacity = opacityInfoBoxEquatorial.value;
+    })
+    .onComplete( function () {
+        toggleEquatorialButton.addEventListener( "click", onEquatorialButtonClicked );
     })
 
 var worldRotation = { value: 0.0 };
@@ -557,24 +612,31 @@ var tweenRotEquatorialFadeIn = new TWEEN.Tween(opacityRotEquatorial)
     .to( { value: 1.0 }, 500)
     .easing(TWEEN.Easing.Quadratic.In)
     .onUpdate(function () {
+        rotEasing = opacityRotEquatorial.value;
         equinox.mesh.material.opacity = opacityRotEquatorial.value;
-        equinoxHourAngleVector.mesh.material.opacity = opacityEquatorial.value;
+        equinoxHourAngleVector.mesh.material.opacity = opacityRotEquatorial.value;
+        rightAscensionVector.mesh.material.opacity = opacityRotEquatorial.value; // fade out hour angle
     })
-    .onComplete(function () {
+    .onStart(function () {
         isRotating = true;
+        toggleEquatorialButton.innerHTML = '> Resting Equatorial System';
     })
 var tweenRotEquatorialFadeOut = new TWEEN.Tween(opacityRotEquatorial)
     .to( { value: 0.0 }, 500)
-    .easing(TWEEN.Easing.Quadratic.In)
+    .easing(TWEEN.Easing.Quadratic.Out)
     .onUpdate(function () {
+        rotEasing = opacityRotEquatorial.value;
         equinox.mesh.material.opacity = opacityRotEquatorial.value;
-        equinoxHourAngleVector.mesh.material.opacity = opacityEquatorial.value;
+        equinoxHourAngleVector.mesh.material.opacity = opacityRotEquatorial.value;
+        rightAscensionVector.mesh.material.opacity = opacityRotEquatorial.value;
+    })
+    .onStart( function () {
+        toggleEquatorialButton.innerHTML = '> Rotating Equatorial System';
     })
     .onComplete(function () {
         isRotating = false;
     })
 
-var mouseOnButton;
 // Setup raycasting (taken directly from the three.js documentation).
 var raycaster = new THREE.Raycaster();
 var mouse_down = new THREE.Vector2();
@@ -602,12 +664,12 @@ function onMouseUp( event ) {
     {
         return;
     }
-    console.log(mouseOnButton);
-    if (mouseOnButton)
+
+    if (mouseOnButton)  // make sure the user isnt hovering over a button
     {
         return;
     }
-    
+
     // Raycasting.
 
     raycaster.setFromCamera( mouse, camera );
@@ -620,12 +682,13 @@ function onMouseUp( event ) {
         switch ( intersects[0].object.parent ) {
             case horizonSystem:
                 tweenEquatorialFadeOut.start();
+                tweenRotEquatorialFadeOut.start();
                 tweenHorizontalFadeIn.start();
                 tweenInfoBoxHorizontalFadeIn.start();
                 tweenInfoBoxEquatorialFadeOut.start();
                 tweenRotateToHorizon.start();
                 break;
-            case equatorialSystem:
+            case restEquatorialSystem:
                 isRotating = false;
                 tweenHorizontalFadeOut.start();
                 tweenEquatorialFadeIn.start();
@@ -638,6 +701,7 @@ function onMouseUp( event ) {
     else    // fade everything back in
     {
         isRotating = false;
+        tweenRotEquatorialFadeOut.start();
         tweenEquatorialFadeIn.start();
         tweenHorizontalFadeIn.start();
         tweenInfoBoxHorizontalFadeOut.start();
@@ -647,23 +711,3 @@ function onMouseUp( event ) {
 }
 addEventListener( 'mousedown', onMouseDown, false );
 addEventListener( 'mouseup', onMouseUp, false );
-
-// Button for toggle between rotational and resting equatorial system.
-var toggleEquatorialButton = document.createElement('div'); // semantically suboptimal, but no borders or highlightings
-toggleEquatorialButton.style.fontFamily = "Helvetica";
-toggleEquatorialButton.style.fontSize = "20px";
-toggleEquatorialButton.style.color = "#666666";
-toggleEquatorialButton.style.position = 'absolute';
-toggleEquatorialButton.style.top = '80%';
-toggleEquatorialButton.style.left = '70%';
-toggleEquatorialButton.innerHTML = '>Resting Equatorial System';
-toggleEquatorialButton.onmouseenter = function () {
-    mouseOnButton = true;
-}
-toggleEquatorialButton.onmouseout = function() {
-    mouseOnButton = false;
-}
-toggleEquatorialButton.addEventListener ("click", function() {
-    tweenRotEquatorialFadeIn.start();
-  });
-document.body.appendChild(toggleEquatorialButton);
