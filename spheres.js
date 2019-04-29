@@ -264,16 +264,16 @@ rotEquatorialSystem.traverse( function (child)
 
 var isRotating = false;
 var rotEasing = 0.0;
-var hourAngle = rightAscension;
-declinationVector.mesh.rotation.y -= hourAngle;
 
-function animate(time ) {
+var horCoords = new HorizontalCoordinates(0.0, 0.0);
+var eqCoords = new RestingEquatorialCoordinates(rightAscension, declination);
+
+declinationVector.mesh.rotation.y -= eqCoords.hourAngle;
+
+function animate( time ) {
     requestAnimationFrame( animate );
-
     TWEEN.update( time );
-
     controls.update();
-    
     var delta = clock.getDelta();
 
 
@@ -284,116 +284,102 @@ function animate(time ) {
         scene.rotation.y += rotEasing * deltatheta;
     }
 
-    hourAngle += deltatheta;
-    if ( hourAngle > 2*Math.PI )
+    eqCoords.hourAngle += deltatheta;
+    while ( eqCoords.hourAngle > 2*Math.PI )
     {
-        hourAngle -= 2*Math.PI;
+        eqCoords.hourAngle -= 2*Math.PI;
     }
 
-    starSystem.rotation.y = -hourAngle;
+    var equinoxAngle = eqCoords.hourAngle - rightAscension;
+    while ( equinoxAngle < 0.0 )
+    {
+        equinoxAngle += 2*Math.PI;
+    }
+
+    horCoords.fromRestingEquatorial(eqCoords, latitude);
+
+    starSystem.rotation.y = -eqCoords.hourAngle;
     rotEquatorialSystem.rotateY(-deltatheta);
     equatorialSystem.rotateY(-deltatheta);
-
-    var eqCoords = new RestingEquatorialCoordinates(hourAngle, declination);
-    var horCoords = new HorizontalCoordinates(0.0, 0.0);
-    horCoords.fromRestingEquatorial(eqCoords, latitude);
 
     altitudeVector.update(1, 0.0, horCoords.altitude, new THREE.Vector3(0.0, 0.0, 0.0), new THREE.Vector3(0.0, 0.0, 1.0));
     altitudeVector.mesh.rotation.y = Math.PI/2-horCoords.azimuth;
     azimuthVector.update(1, Math.PI, -horCoords.azimuth, new THREE.Vector3(0.0, 0.0, 0.0), new THREE.Vector3(0.0, 1.0, 0.0));
 
-    var equinoxAngle = hourAngle-rightAscension;
-    if (equinoxAngle < 0.0 )
-    {
-        equinoxAngle += 2*Math.PI;
-    }
-
     equinoxHourAngleVector.update(1, -Math.PI/2+equinoxAngle, -Math.PI/2, new THREE.Vector3(0.0, 0.0, 0.0), new THREE.Vector3(0.0, 1.0, 0.0));
-    hourAngleVector.update(1, -Math.PI/2, -Math.PI/2 - hourAngle, new THREE.Vector3(0.0, 0.0, 0.0), new THREE.Vector3(0.0, 1.0, 0.0));
+    hourAngleVector.update(1, -Math.PI/2, -Math.PI/2 - eqCoords.hourAngle, new THREE.Vector3(0.0, 0.0, 0.0), new THREE.Vector3(0.0, 1.0, 0.0));
 
     renderer.render( scene, camera );
 };
 
 animate();
 
-// Information box.
+// Information boxes.
+class InfoBox {
+    constructor(title = '', text = '') {
+        this.html = document.createElement('div')
+        this.html.style.top = "10%";
+        this.html.style.left = "70%";
+        this.html.style.width = '25%';
+        this.html.style.opacity = 0.0;
+        this.html.style.webkitUserSelect = "none";
+        this.html.style.msUserSelect = "none";
+        this.html.style.mozUserSelect = "none";
+        document.body.append(this.html);
 
-var infoBoxHorizontal = document.createElement('div')
-infoBoxHorizontal.style.top = "10%";
-infoBoxHorizontal.style.left = "70%";
-infoBoxHorizontal.style.width = 500;
-infoBoxHorizontal.style.height = 8000;
-infoBoxHorizontal.style.opacity = 0.0;
-infoBoxHorizontal.style.webkitUserSelect = "none";
-infoBoxHorizontal.style.msUserSelect = "none";
-infoBoxHorizontal.style.mozUserSelect = "none";
-document.body.append(infoBoxHorizontal);
+        this.titleElement = document.createElement('div');
+        this.titleElement.style.fontFamily = "Helvetica";
+        this.titleElement.style.fontSize = "40px";
+        this.titleElement.style.color = "#666666";
+        this.titleElement.style.position = 'absolute';
+        this.titleElement.style.width = '25%';
+        this.titleElement.style.height = 50;
+        this.titleElement.innerHTML = title;
+        this.titleElement.style.top = 10 + '%';
+        this.titleElement.style.left = 70 + '%';
+        this.html.appendChild(this.titleElement);
+        
+        this.textElement = document.createElement('div');
+        this.textElement.style.fontFamily = "Helvetica";
+        this.textElement.style.fontSize = "20px";
+        this.textElement.style.color = "#666666";
+        this.textElement.style.position = 'absolute';
+        this.textElement.style.width = '25%';
+        this.textElement.innerHTML = text;
+        this.textElement.style.top = 20 + '%';
+        this.textElement.style.left = 70 + '%';
+        this.html.appendChild(this.textElement);
+    }
 
-var infoTitleHorizontal = document.createElement('div');
-infoTitleHorizontal.style.fontFamily = "Helvetica";
-infoTitleHorizontal.style.fontSize = "40px";
-infoTitleHorizontal.style.color = "#666666";
-infoTitleHorizontal.style.position = 'absolute';
-infoTitleHorizontal.style.width = 500;
-infoTitleHorizontal.style.height = 50;
-infoTitleHorizontal.innerHTML = "The Horizontal System";
-infoTitleHorizontal.style.top = 10 + '%';
-infoTitleHorizontal.style.left = 70 + '%';
-infoBoxHorizontal.appendChild(infoTitleHorizontal);
+    set title(title) {
+        this.titleElement.innerHTML = title;
+    }
 
-var infoHorizontal = document.createElement('div');
-infoHorizontal.style.fontFamily = "Helvetica";
-infoHorizontal.style.fontSize = "20px";
-infoHorizontal.style.color = "#666666";
-infoHorizontal.style.position = 'absolute';
-infoHorizontal.style.width = 500;
-infoHorizontal.style.height = 800;
-infoHorizontal.innerHTML = "Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua.\
-                 At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet.\
-                 Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua.\
-                 At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet.";
-infoHorizontal.style.top = 20 + '%';
-infoHorizontal.style.left = 70 + '%';
-infoBoxHorizontal.appendChild(infoHorizontal);
+    set text(text) {
+        this.textElement.innerHTML = text;
+    }
+}
 
-var infoBoxEquatorial = document.createElement('div')
-infoBoxEquatorial.style.top = "10%";
-infoBoxEquatorial.style.left = "70%";
-infoBoxEquatorial.style.width = 500;
-infoBoxEquatorial.style.height = 8000;
-infoBoxEquatorial.style.opacity = 0.0;
-infoBoxEquatorial.style.webkitUserSelect = "none";
-infoBoxEquatorial.style.msUserSelect = "none";
-infoBoxEquatorial.style.mozUserSelect = "none";
-document.body.append(infoBoxEquatorial);
+var infoBoxEquatorial = new InfoBox('The Equatorial System');
+infoBoxEquatorial.text = 'In the Equatorial System, the stars position is described by its <font color="#bc5090">hour angle</font> and <font color="#bc5090">declination</font>.\
+Like in the horizontal system, the hour angle starts at the south point on the equatorial horizon.<br>\
+At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet.\
+Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua.\
+At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet.';
 
-var infoTitleEquatorial = document.createElement('div');
-infoTitleEquatorial.style.fontFamily = "Helvetica";
-infoTitleEquatorial.style.fontSize = "40px";
-infoTitleEquatorial.style.color = "#666666";
-infoTitleEquatorial.style.position = 'absolute';
-infoTitleEquatorial.style.width = 500;
-infoTitleEquatorial.style.height = 50;
-infoTitleEquatorial.innerHTML = "The Equatorial System";
-infoTitleEquatorial.style.top = 10 + '%';
-infoTitleEquatorial.style.left = 70 + '%';
-infoBoxEquatorial.appendChild(infoTitleEquatorial);
+var infoBoxRotEquatorial = new InfoBox('The Rotating Equatorial System');
+infoBoxRotEquatorial.text = 'In the Equatorial System, the stars position is described by its <font color="#bc5090">hour angle</font> and <font color="#bc5090">declination</font>.\
+Like in the horizontal system, the hour angle starts at the south point on the equatorial horizon.<br>\
+At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet.\
+Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua.\
+At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet.';
 
-var infoEquatorial = document.createElement('div');
-infoEquatorial.style.fontFamily = "Helvetica";
-infoEquatorial.style.fontSize = "20px";
-infoEquatorial.style.color = "#666666";
-infoEquatorial.style.position = 'absolute';
-infoEquatorial.style.width = 500;
-infoEquatorial.style.height = 800;
-infoEquatorial.innerHTML = 'In the Equatorial System, the stars position is described by its <font color="#bc5090">hour angle</font> and <font color="#bc5090">declination</font>.\
-                            Like in the horizontal system, the hour angle starts at the south point on the equatorial horizon.<br>\
-                            At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet.\
-                            Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua.\
-                            At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet.';
-infoEquatorial.style.top = 20 + '%';
-infoEquatorial.style.left = 70 + '%';
-infoBoxEquatorial.appendChild(infoEquatorial);
+var infoBoxHorizontal = new InfoBox('The Horizontal System');
+infoBoxHorizontal.text = 'In the Equatorial System, the stars position is described by its <font color="#bc5090">hour angle</font> and <font color="#bc5090">declination</font>.\
+Like in the horizontal system, the hour angle starts at the south point on the equatorial horizon.<br>\
+At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet.\
+Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua.\
+At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet.';
 
 var mouseOnButton;
 // Button for toggle between rotational and resting equatorial system.
@@ -411,7 +397,7 @@ toggleEquatorialButton.onmouseenter = function () {
 toggleEquatorialButton.onmouseout = function() {
     mouseOnButton = false;
 }
-infoBoxEquatorial.appendChild(toggleEquatorialButton);
+infoBoxEquatorial.html.appendChild(toggleEquatorialButton);
 
 function onEquatorialButtonClicked() {
     if ( !isRotating ) {
@@ -556,40 +542,27 @@ var tweenHorizontalFadeIn = new TWEEN.Tween(opacityHorizontal)
         });   
     })
 
-var opacityInfoBoxHorizontal = { value: 0.0 };
-var tweenInfoBoxHorizontalFadeOut = new TWEEN.Tween(opacityInfoBoxHorizontal)
-    .to( { value: 0.0 }, 500 )
-    .easing(TWEEN.Easing.Quadratic.Out)
-    .onUpdate(function() {
-        infoBoxHorizontal.style.opacity = opacityInfoBoxHorizontal.value;
-    })
-var tweenInfoBoxHorizontalFadeIn = new TWEEN.Tween(opacityInfoBoxHorizontal)
-    .to( { value: 1.0 }, 500 )
-    .easing(TWEEN.Easing.Quadratic.In)
-    .onUpdate(function() {
-        infoBoxHorizontal.style.opacity = opacityInfoBoxHorizontal.value;
-    })
+function fadeOutBox(box) {
+    var opacity = { value: box.style.opacity };
+    var tween = new TWEEN.Tween(opacity)
+        .to( {value: 0.0 }, 500)
+        .easing(TWEEN.Easing.Quadratic.Out)
+        .onUpdate(function() {
+            box.style.opacity = opacity.value;
+        });
+    tween.start();
+}
 
-var opacityInfoBoxEquatorial = { value: 0.0 };
-var tweenInfoBoxEquatorialFadeOut = new TWEEN.Tween(opacityInfoBoxEquatorial)
-    .to( { value: 0.0 }, 500 )
-    .easing(TWEEN.Easing.Quadratic.Out)
-    .onUpdate(function() {
-        infoBoxEquatorial.style.opacity = opacityInfoBoxEquatorial.value;
-    })
-    .onComplete( function() {
-        toggleEquatorialButton.removeEventListener( "click", onEquatorialButtonClicked );
-    })
-
-var tweenInfoBoxEquatorialFadeIn = new TWEEN.Tween(opacityInfoBoxEquatorial)
-    .to( { value: 1.0 }, 500 )
-    .easing(TWEEN.Easing.Quadratic.In)
-    .onUpdate( function() {
-        infoBoxEquatorial.style.opacity = opacityInfoBoxEquatorial.value;
-    })
-    .onComplete( function () {
-        toggleEquatorialButton.addEventListener( "click", onEquatorialButtonClicked );
-    })
+function fadeInBox(box) {
+    var opacity = { value: box.style.opacity };
+    var tween = new TWEEN.Tween(opacity)
+        .to( {value: 1.0 }, 500)
+        .easing(TWEEN.Easing.Quadratic.In)
+        .onUpdate(function() {
+            box.style.opacity = opacity.value;
+        });
+    tween.start();    
+}
 
 var worldRotation = { value: 0.0 };
 var tweenRotateToEquator = new TWEEN.Tween(worldRotation)
@@ -684,16 +657,18 @@ function onMouseUp( event ) {
                 tweenEquatorialFadeOut.start();
                 tweenRotEquatorialFadeOut.start();
                 tweenHorizontalFadeIn.start();
-                tweenInfoBoxHorizontalFadeIn.start();
-                tweenInfoBoxEquatorialFadeOut.start();
+                fadeInBox(infoBoxHorizontal.html);
+                fadeOutBox(infoBoxEquatorial.html);
+                toggleEquatorialButton.removeEventListener( "click", onEquatorialButtonClicked );
                 tweenRotateToHorizon.start();
                 break;
             case restEquatorialSystem:
                 isRotating = false;
                 tweenHorizontalFadeOut.start();
                 tweenEquatorialFadeIn.start();
-                tweenInfoBoxEquatorialFadeIn.start();
-                tweenInfoBoxHorizontalFadeOut.start();
+                fadeInBox(infoBoxEquatorial.html);
+                fadeOutBox(infoBoxHorizontal.html);
+                toggleEquatorialButton.addEventListener( "click", onEquatorialButtonClicked );
                 tweenRotateToEquator.start();
                 break;
         }
@@ -704,8 +679,9 @@ function onMouseUp( event ) {
         tweenRotEquatorialFadeOut.start();
         tweenEquatorialFadeIn.start();
         tweenHorizontalFadeIn.start();
-        tweenInfoBoxHorizontalFadeOut.start();
-        tweenInfoBoxEquatorialFadeOut.start();
+        fadeOutBox(infoBoxHorizontal.html);
+        fadeOutBox(infoBoxEquatorial.html);
+        toggleEquatorialButton.removeEventListener( "click", onEquatorialButtonClicked );
         tweenRotateToHorizon.start();
     }
 }

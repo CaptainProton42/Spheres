@@ -16,7 +16,7 @@ class HorizontalCoordinates {
         {
             this.azimuth += 2*Math.PI;
         }
-        this.altitude = Math.asin(Math.sin(latitude) * Math.sin(input.declination)  + Math.cos(latitude) * Math.cos(input.declination) * Math.cos(hourAngle));
+        this.altitude = Math.asin(Math.sin(latitude) * Math.sin(input.declination)  + Math.cos(latitude) * Math.cos(input.declination) * Math.cos(input.hourAngle));
     };
 }
 
